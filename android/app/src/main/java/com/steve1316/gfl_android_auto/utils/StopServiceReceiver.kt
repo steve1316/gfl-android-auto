@@ -1,4 +1,4 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context

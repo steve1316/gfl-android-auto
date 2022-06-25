@@ -1,12 +1,12 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
-import com.example.cv_bot_template.MainActivity
-import com.example.cv_bot_template.bot.Game
+import com.steve1316.gfl_android_auto.MainActivity
+import com.steve1316.gfl_android_auto.bot.Game
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions

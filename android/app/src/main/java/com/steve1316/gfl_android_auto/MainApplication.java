@@ -1,4 +1,4 @@
-package com.example.cv_bot_template;
+package com.steve1316.gfl_android_auto;
 
 import android.app.Application;
 import android.content.Context;

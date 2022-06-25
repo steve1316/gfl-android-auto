@@ -1,4 +1,4 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -25,8 +25,8 @@ import android.view.OrientationEventListener
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.example.cv_bot_template.MainActivity.loggerTag
-import com.example.cv_bot_template.StartModule
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.StartModule
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException

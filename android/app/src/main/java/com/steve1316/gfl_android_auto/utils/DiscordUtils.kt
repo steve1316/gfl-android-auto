@@ -1,11 +1,11 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
-import com.example.cv_bot_template.MainActivity.loggerTag
-import com.example.cv_bot_template.R
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.R
 import org.javacord.api.DiscordApi
 import org.javacord.api.DiscordApiBuilder
 import org.javacord.api.entity.channel.PrivateChannel

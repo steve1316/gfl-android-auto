@@ -10,4 +10,4 @@ to the operations performed by the bot.-->
     android:canRetrieveWindowContent="true"
     android:description="@string/accessibility_service_description"
     android:notificationTimeout="1000"
-    android:settingsActivity="com.example.android.accessibility.ServiceSettingsActivity" />
+    android:settingsActivity="com.steve1316.android.accessibility.ServiceSettingsActivity" />

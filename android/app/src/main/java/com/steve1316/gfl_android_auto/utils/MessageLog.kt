@@ -1,10 +1,10 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.example.cv_bot_template.MainActivity.loggerTag
-import com.example.cv_bot_template.StartModule
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.StartModule
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime

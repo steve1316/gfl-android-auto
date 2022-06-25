@@ -1,13 +1,13 @@
-package com.example.cv_bot_template.bot
+package com.steve1316.gfl_android_auto.bot
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
-import com.example.cv_bot_template.MainActivity.loggerTag
-import com.example.cv_bot_template.StartModule
-import com.example.cv_bot_template.data.ConfigData
-import com.example.cv_bot_template.utils.*
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.StartModule
+import com.steve1316.gfl_android_auto.data.ConfigData
+import com.steve1316.gfl_android_auto.utils.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.opencv.core.Point

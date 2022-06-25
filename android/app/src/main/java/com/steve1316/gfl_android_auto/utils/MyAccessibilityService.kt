@@ -1,4 +1,4 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
@@ -13,7 +13,7 @@ import android.os.Build
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
-import com.example.cv_bot_template.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 

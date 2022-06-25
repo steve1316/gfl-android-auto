@@ -1,6 +1,4 @@
-package com.example.cv_bot_template;
-
-import static com.example.cv_bot_template.MainActivity.loggerTag;
+package com.steve1316.gfl_android_auto;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,8 +11,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.cv_bot_template.utils.MediaProjectionService;
-import com.example.cv_bot_template.utils.MyAccessibilityService;
+import com.steve1316.gfl_android_auto.R;
+import com.steve1316.gfl_android_auto.utils.MediaProjectionService;
+import com.steve1316.gfl_android_auto.utils.MyAccessibilityService;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -26,7 +25,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import java.util.Objects;
 
 public class StartModule extends ReactContextBaseJavaModule implements ActivityEventListener {
-    private final String tag = loggerTag + "StartModule";
+    private final String tag = MainActivity.loggerTag + "StartModule";
     private static ReactApplicationContext reactContext;
     private static DeviceEventManagerModule.RCTDeviceEventEmitter emitter = null;
 

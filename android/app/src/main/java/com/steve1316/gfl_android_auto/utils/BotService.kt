@@ -1,4 +1,4 @@
-package com.example.cv_bot_template.utils
+package com.steve1316.gfl_android_auto.utils
 
 import android.annotation.SuppressLint
 import android.app.Service
@@ -17,10 +17,10 @@ import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import com.example.cv_bot_template.MainActivity.loggerTag
-import com.example.cv_bot_template.R
-import com.example.cv_bot_template.StartModule
-import com.example.cv_bot_template.bot.Game
+import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.R
+import com.steve1316.gfl_android_auto.StartModule
+import com.steve1316.gfl_android_auto.bot.Game
 import kotlinx.coroutines.runBlocking
 import kotlin.concurrent.thread
 import kotlin.math.roundToInt
