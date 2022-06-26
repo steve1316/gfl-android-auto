@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Example CV Bot Template</string>
-    <string name="accessibility_service_label">Accessibility Service for Example CV Bot Template</string>
+    <string name="app_name">GFL Android Auto</string>
+    <string name="accessibility_service_label">Accessibility Service for GFL Android Auto</string>
 
     <string name="accessibility_service_description">This is the Accessibility Service that will allow the bot process to interact with the screen
         like tapping and swiping via gestures.\n\nFor Developers: If the Toast message does not pop up immediately, disable and enable this
