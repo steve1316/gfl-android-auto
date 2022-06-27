@@ -5,12 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
-import com.steve1316.gfl_android_auto.MainActivity
-import com.steve1316.gfl_android_auto.bot.Game
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.googlecode.tesseract.android.TessBaseAPI
+import com.steve1316.gfl_android_auto.MainActivity
+import com.steve1316.gfl_android_auto.bot.Game
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
@@ -435,6 +435,37 @@ class ImageUtils(context: Context, private val game: Game) {
 		}
 
 		return matchLocations
+	}
+
+	fun saveScreenshot(fileName: String): Boolean {
+		var srcBitmap: Bitmap? = null
+
+		// Keep swiping a little bit up and down to trigger a new image for ImageReader to grab.
+		var tries = 30
+		while (srcBitmap == null) {
+			srcBitmap = MediaProjectionService.takeScreenshotNow()
+
+			if (srcBitmap == null) {
+				game.gestureUtils.swipe(500f, 500f, 500f, 400f, 100L)
+				game.gestureUtils.swipe(500f, 400f, 500f, 500f, 100L)
+				game.wait(0.5)
+			}
+
+
+			if (tries <= 0) {
+				game.printToLog("[ERROR] Failed to save screenshot.", tag = tag, isError = true)
+				return false
+			} else {
+				tries -= 1
+			}
+		}
+
+		val srcMat = Mat()
+		Utils.bitmapToMat(srcBitmap, srcMat)
+		Imgcodecs.imwrite("${ImageUtils.matchFilePath}/$fileName.png", srcMat)
+		game.printToLog("[INFO] Saved screenshot to ${ImageUtils.matchFilePath}/$fileName.png", tag = tag)
+		game.wait(0.1)
+		return true
 	}
 
 	/**

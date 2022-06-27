@@ -127,6 +127,20 @@ class Game(private val myContext: Context) {
 	}
 
 	/**
+	 * Takes 5 screenshots back to back.
+	 *
+	 */
+	private fun takeSetupScreenshots() {
+		var tries = 1
+		while (tries <= 5) {
+			val result: Boolean = imageUtils.saveScreenshot("$tries")
+			if (result) {
+				tries += 1
+				wait(1.0)
+			}
+		}
+	}
+	/**
 	 * Bot will begin automation here.
 	 *
 	 * @return True if all automation goals have been met. False otherwise.
