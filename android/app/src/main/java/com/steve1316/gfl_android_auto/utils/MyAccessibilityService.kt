@@ -190,6 +190,56 @@ class MyAccessibilityService : AccessibilityService() {
 	}
 
 	/**
+	 * Performs the pinch in/out gesture on the screen.
+	 *
+	 * @param centerX The x coordinate on the screen to start the gesture.
+	 * @param centerY The y coordinate on the screen to start the gesture.
+	 * @param startSpacing The distance to start the gesture from.
+	 * @param endSpacing The distance to end the gesture to.
+	 */
+	fun zoom(centerX: Float, centerY: Float, startSpacing: Float, endSpacing: Float) {
+		// Source: https://android.googlesource.com/platform/cts/+/067e9dc/tests/accessibilityservice/src/android/accessibilityservice/cts/AccessibilityGestureDispatchTest.java
+		val startPoint1 = FloatArray(2)
+		val endPoint1 = FloatArray(2)
+		val startPoint2 = FloatArray(2)
+		val endPoint2 = FloatArray(2)
+
+		// Build points for a horizontal gesture centered at the origin.
+		startPoint1[0] = startSpacing / 2
+		startPoint1[1] = 0f
+		endPoint1[0] = endSpacing / 2
+		endPoint1[1] = 0f
+		startPoint2[0] = -startSpacing / 2
+		startPoint2[1] = 0f
+		endPoint2[0] = -endSpacing / 2
+		endPoint2[1] = 0f
+
+		// Rotate and translate the points.
+		val matrix = Matrix()
+		matrix.setRotate(0f) // 0 degrees is horizontal
+		matrix.postTranslate(centerX, centerY)
+		matrix.mapPoints(startPoint1)
+		matrix.mapPoints(endPoint1)
+		matrix.mapPoints(startPoint2)
+		matrix.mapPoints(endPoint2)
+
+		// Create the Paths.
+		val path1 = Path()
+		path1.moveTo(startPoint1[0], startPoint1[1])
+		path1.lineTo(endPoint1[0], endPoint1[1])
+		val path2 = Path()
+		path2.moveTo(startPoint2[0], startPoint2[1])
+		path2.lineTo(endPoint2[0], endPoint2[1])
+
+		val gesture: GestureDescription = GestureDescription.Builder()
+			.addStroke(GestureDescription.StrokeDescription(path1, 0, 350))
+			.addStroke(GestureDescription.StrokeDescription(path2, 0, 350))
+			.build()
+
+		dispatchGesture(gesture, null, null)
+	}
+
+	/**
 	 * Creates a scroll gesture either scrolling up or down the screen depending on the given action.
 	 *
 	 * @param scrollDown The scrolling action, either up or down the screen. Defaults to true which is scrolling down.
