@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.graphics.Path
 import android.os.Build
 import android.util.Log
@@ -147,8 +148,9 @@ class MyAccessibilityService : AccessibilityService() {
 	 */
 	fun tap(x: Double, y: Double, buttonName: String, ignoreWait: Boolean = false, longPress: Boolean = false, taps: Int = 1): Boolean {
 		// Randomize the tapping location.
+		Log.d(tag, "Received ($x, $y). Randomizing it now...")
 		val (newX, newY) = randomizeTapLocation(x, y, buttonName)
-		Log.d(tag, "Tapping $newX, $newY")
+		Log.d(tag, "Tapping ($newX, $newY)")
 
 		// Construct the tap gesture.
 		val tapPath = Path().apply {
@@ -247,7 +249,7 @@ class MyAccessibilityService : AccessibilityService() {
 	 * @param ignoreWait Whether or not to not wait 0.5 seconds after dispatching the gesture.
 	 * @return True if the scroll gesture was executed successfully. False otherwise.
 	 */
-	fun scroll(scrollDown: Boolean = true, duration: Long = 500L, ignoreWait: Boolean = false): Boolean {
+	fun scroll(scrollDown: Boolean = true, duration: Long = 250L, ignoreWait: Boolean = false): Boolean {
 		val scrollPath = Path()
 
 		// Get certain portions of the screen's dimensions.
@@ -293,20 +295,12 @@ class MyAccessibilityService : AccessibilityService() {
 			addStroke(GestureDescription.StrokeDescription(scrollPath, 0, duration))
 		}.build()
 
+		val direction: String = if (scrollDown) "down" else "up"
+		Log.d(tag, "Scrolling $direction.")
+
 		val dispatchResult = dispatchGesture(gesture, null, null)
 		if (!ignoreWait) {
 			0.5.wait()
-		}
-
-		if (!dispatchResult) {
-			Log.e(tag, "Failed to dispatch scroll gesture.")
-		} else {
-			val direction: String = if (scrollDown) {
-				"down"
-			} else {
-				"up"
-			}
-			Log.d(tag, "Scrolling $direction.")
 		}
 
 		return dispatchResult
@@ -323,7 +317,7 @@ class MyAccessibilityService : AccessibilityService() {
 	 * @param ignoreWait Whether or not to not wait 0.5 seconds after dispatching the gesture.
 	 * @return True if the swipe gesture was executed successfully. False otherwise.
 	 */
-	fun swipe(oldX: Float, oldY: Float, newX: Float, newY: Float, duration: Long = 500L, ignoreWait: Boolean = false): Boolean {
+	fun swipe(oldX: Float, oldY: Float, newX: Float, newY: Float, duration: Long = 250L, ignoreWait: Boolean = false): Boolean {
 		// Set up the Path by swiping from the old position coordinates to the new position coordinates.
 		val swipePath = Path().apply {
 			moveTo(oldX, oldY)
@@ -333,6 +327,8 @@ class MyAccessibilityService : AccessibilityService() {
 		val gesture = GestureDescription.Builder().apply {
 			addStroke(GestureDescription.StrokeDescription(swipePath, 0, duration))
 		}.build()
+
+		Log.d(tag, "Swiping from (${oldX}, ${oldY}) to (${newX}, ${newY}).")
 
 		val dispatchResult = dispatchGesture(gesture, null, null)
 		if (!ignoreWait) {
