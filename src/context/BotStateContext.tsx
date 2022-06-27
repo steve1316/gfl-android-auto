@@ -1,12 +1,17 @@
 import React, { createContext, useState } from "react"
 
 export interface Settings {
-    property1: boolean
-
     discord: {
         enableDiscordNotifications: boolean
         discordToken: string
         discordUserID: string
+    }
+
+    gfl: {
+        map: string
+        amount: number
+        dummyEchelons: number[]
+        dpsEchelons: number[]
     }
 
     android: {
@@ -21,11 +26,16 @@ export interface Settings {
 
 // Set the default settings.
 export const defaultSettings: Settings = {
-    property1: false,
     discord: {
         enableDiscordNotifications: false,
         discordToken: "",
         discordUserID: "",
+    },
+    gfl: {
+        map: "",
+        amount: 1,
+        dummyEchelons: [],
+        dpsEchelons: [],
     },
     android: {
         enableDelayTap: false,
