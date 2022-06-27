@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.data.SetupData
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -48,7 +49,23 @@ class JSONParser {
 
 				commit()
 			}
-		} catch(e: Exception) {}
+		} catch (e: Exception) {
+		}
+
+		try {
+			val gflObj = jObj.getJSONObject("gfl")
+			sharedPreferences.edit {
+				putString("map", gflObj.getString("map"))
+				putInt("amount", gflObj.getInt("amount"))
+				putString("dummyEchelons", toStringArrayList(gflObj.getJSONArray("dummyEchelons")).joinToString("|"))
+				putString("dpsEchelons", toStringArrayList(gflObj.getJSONArray("dpsEchelons")).joinToString("|"))
+				commit()
+			}
+
+			// Load the map data.
+			loadMap(gflObj.getString("map"), myContext)
+		} catch (e: Exception) {
+		}
 
 		try {
 			val androidObj = jObj.getJSONObject("android")
@@ -81,5 +98,27 @@ class JSONParser {
 		}
 
 		return newArrayList
+	}
+
+	/**
+	 * Loads the map data which includes the initial setup steps and subsequent Planning Mode moves.
+	 *
+	 * @param mapName Name of the map to run.
+	 * @param myContext The application context.
+	 */
+	private fun loadMap(mapName: String, myContext: Context) {
+		val mapString = myContext.assets?.open("maps/$mapName.json")?.bufferedReader().use { it?.readText() } ?: throw Exception("Could not load map data for $mapName.")
+		val mapObj = JSONObject(mapString)
+
+		try {
+			val initObj = mapObj.getJSONObject("init")
+			SetupData.setupSteps.clear()
+			initObj.keys().forEach { key ->
+				val jsonObj = initObj.get(key) as JSONObject
+				@Suppress("UNCHECKED_CAST")
+				SetupData.setupSteps.add(SetupData.Companion.Init(jsonObj.getString("action"), jsonObj.get("spacing") as ArrayList<Int>, jsonObj.get("coordinates") as ArrayList<Int>))
+			}
+		} catch (e: Exception) {
+		}
 	}
 }

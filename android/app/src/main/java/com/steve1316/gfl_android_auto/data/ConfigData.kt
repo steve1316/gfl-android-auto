@@ -11,11 +11,11 @@ class ConfigData(myContext: Context) {
 
 	val debugMode: Boolean
 
-	// Twitter
-	val twitterAPIKey: String
-	val twitterAPIKeySecret: String
-	val twitterAccessToken: String
-	val twitterAccessTokenSecret: String
+	// GFL
+	val mapName: String
+	val amount: Int
+	val dummyEchelons: List<String>
+	val dpsEchelons: List<String>
 
 	// Discord
 	val enableDiscordNotifications: Boolean
@@ -36,11 +36,11 @@ class ConfigData(myContext: Context) {
 
 		debugMode = sharedPreferences.getBoolean("debugMode", false)
 
-		// Consumer keys and access tokens required to use the Twitter API.
-		twitterAPIKey = sharedPreferences.getString("twitterAPIKey", "")!!
-		twitterAPIKeySecret = sharedPreferences.getString("twitterAPIKeySecret", "")!!
-		twitterAccessToken = sharedPreferences.getString("twitterAccessToken", "")!!
-		twitterAccessTokenSecret = sharedPreferences.getString("twitterAccessTokenSecret", "")!!
+		// GFL settings.
+		mapName = sharedPreferences.getString("map", "")!!
+		amount = sharedPreferences.getInt("amount", 1)
+		dummyEchelons = sharedPreferences.getString("dummyEchelons", "")!!.split("|")
+		dpsEchelons = sharedPreferences.getString("dpsEchelons", "")!!.split("|")
 
 		// Token and user ID for use with the Discord API.
 		enableDiscordNotifications = sharedPreferences.getBoolean("enableDiscordNotifications", false)
