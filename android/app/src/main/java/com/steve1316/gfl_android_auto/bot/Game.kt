@@ -28,6 +28,7 @@ class Game(private val myContext: Context) {
 	private val op: Operation = Operation(this)
 	var runsCompleted = 0
 	val maxChapterNumber: Int = 11
+	var is1920 = false
 
 	/**
 	 * Returns a formatted string of the elapsed time since the bot started as HH:MM:SS format.
@@ -136,6 +137,20 @@ class Game(private val myContext: Context) {
 	}
 
 	/**
+	 * Perform a dimensions check of the device to check if it has one of the supported resolutions.
+	 *
+	 */
+	private fun dimensionCheck() {
+		is1920 = if (MediaProjectionService.displayWidth == 1920 && MediaProjectionService.displayHeight == 1080) {
+			true
+		} else if (MediaProjectionService.displayWidth == 2560 && MediaProjectionService.displayHeight == 1080) {
+			false
+		} else {
+			throw Exception("Wrong system resolution set to ${MediaProjectionService.displayWidth}x${MediaProjectionService.displayHeight}. Note that supported dimensions are 1920x1080 and 2560x1080.")
+		}
+	}
+
+	/**
 	 * Takes 5 screenshots back to back.
 	 *
 	 */
@@ -158,9 +173,11 @@ class Game(private val myContext: Context) {
 	fun start(): Boolean {
 		val startTime: Long = System.currentTimeMillis()
 
+		// Perform pre-checks.
 		landscapeCheck()
+		dimensionCheck()
 
-		wait(1.0)
+		if (!configData.enableSetup) wait(1.0) else wait(3.0)
 
 		if (configData.debugMode) {
 			printToLog("\n[DEBUG] I am starting here but as a debugging message!")
