@@ -143,8 +143,10 @@ class Operation(val game: Game) {
 		game.printToLog("\n= = = = = = = = = = = = = = = =", tag = tag)
 		game.printToLog("[SETUP_PLANNING_MODE] Laying out the moves for Planning Mode now...", tag = tag)
 
+		if (game.imageUtils.findImage("planning_mode") == null) throw Exception("Failed to find Planning Mode.")
 
 		PlanningModeData.moves.forEach { move ->
+			if (game.configData.debugMode) game.printToLog("[DEBUG] Move executing: $move", tag = tag)
 			when (move.action) {
 				"start" -> {
 					// Resupply DPS echelon.
