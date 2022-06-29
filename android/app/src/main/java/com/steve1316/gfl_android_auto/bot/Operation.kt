@@ -42,16 +42,20 @@ class Operation(val game: Game) {
 					game.wait(2.0)
 				}
 				"deploy_dummy" -> {
-					game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})")
-					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
-					game.wait(1.0)
-					deployEchelon(echelonDeploymentNumber)
+					if (!game.configData.enableSetup) {
+						game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
+						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+						game.wait(1.0)
+						deployEchelon(echelonDeploymentNumber)
+					}
 				}
 				"deploy_echelon" -> {
-					game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})")
-					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
-					game.wait(1.0)
-					deployEchelon(echelonDeploymentNumber)
+					if (!game.configData.enableSetup) {
+						game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
+						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+						game.wait(1.0)
+						deployEchelon(echelonDeploymentNumber)
+					}
 				}
 				else -> {
 					throw Exception("Invalid action")
