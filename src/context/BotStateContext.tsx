@@ -32,7 +32,7 @@ export const defaultSettings: Settings = {
         discordUserID: "",
     },
     gfl: {
-        map: "",
+        map: "0-2",
         amount: 1,
         dummyEchelons: [],
         dpsEchelons: [],
