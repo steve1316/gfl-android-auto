@@ -3,6 +3,7 @@ package com.steve1316.gfl_android_auto.bot
 import com.steve1316.gfl_android_auto.data.PlanningModeData
 import com.steve1316.gfl_android_auto.data.SetupData
 import com.steve1316.gfl_android_auto.utils.MediaProjectionService
+import org.opencv.core.Point
 
 /**
  * This class takes care of preparing for and executing operations including deploying echelons.
@@ -76,10 +77,14 @@ class Operation(val game: Game) {
 	 * @param echelonNumber The required echelon to deploy.
 	 * @return True if the echelon was deployed.
 	 */
-	fun deployEchelon(echelonNumber: Int): Boolean {
-		// If the echelon cannot be found, then find the nearest one and scroll up or down the list.
-		var echelonLocation = game.imageUtils.findImage("echelon$echelonDeploymentNumber")
-		if (echelonLocation != null) {
+	private fun deployEchelon(echelonNumber: Int): Boolean {
+		// If the initial check failed, then attempt to find it in the list.
+		var echelonLocation: Point? = game.imageUtils.findImage(
+			"echelon$echelonNumber", tries = 1,
+			region = intArrayOf(0, 0, MediaProjectionService.displayWidth / 2, MediaProjectionService.displayHeight)
+		)
+		if (echelonLocation == null) {
+			// If the echelon cannot be found, then find the nearest one and scroll up or down the list.
 			var tempEchelonNumber = 1
 			while (tempEchelonNumber <= 10) {
 				echelonLocation = game.imageUtils.findImage(
@@ -97,22 +102,22 @@ class Operation(val game: Game) {
 							echelonLocation.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, echelonLocation.x.toFloat(),
 							(MediaProjectionService.displayHeight.toFloat() / 2) - 400
 						)
-					} else {
-						game.printToLog("[DEPLOY_ECHELON] Nearest echelon of $tempEchelonNumber is more than the required echelon number so scrolling the list up.")
+
+						// Wait for the scrolling animation to settle.
+						game.wait(2.0)
+					} else if (tempEchelonNumber > echelonNumber) {
+						game.printToLog("[DEPLOY_ECHELON] Nearest echelon of $tempEchelonNumber is more than the required echelon number so scrolling the list up.", tag = tag)
 						game.gestureUtils.swipe(
 							echelonLocation.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, echelonLocation.x.toFloat(),
 							(MediaProjectionService.displayHeight.toFloat() / 2) + 400
 						)
+
+						// Wait for the scrolling animation to settle.
+						game.wait(2.0)
 					}
 
-					// Wait for the scrolling animation to settle.
-					game.wait(2.0)
-
 					// Now check if the bot has the correct echelon in view.
-					echelonLocation = game.imageUtils.findImage(
-						"echelon$echelonNumber", confidence = 0.95,
-						region = intArrayOf(0, 0, MediaProjectionService.displayWidth / 2, MediaProjectionService.displayHeight)
-					)
+					echelonLocation = game.imageUtils.findImage("echelon$echelonNumber", region = intArrayOf(0, 0, MediaProjectionService.displayWidth / 2, MediaProjectionService.displayHeight))
 					if (echelonLocation != null) {
 						break
 					}
