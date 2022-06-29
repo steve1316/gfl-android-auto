@@ -139,22 +139,6 @@ const Settings = () => {
                             })}
                     </Picker>
                 </View>
-
-                <Text style={{ marginTop: 10, marginBottom: 10 }}>Set Number of Runs</Text>
-                <NumericInput
-                    type="plus-minus"
-                    leftButtonBackgroundColor="#eb5056"
-                    rightButtonBackgroundColor="#EA3788"
-                    rounded
-                    valueType="integer"
-                    minValue={1}
-                    maxValue={100}
-                    value={bsc.settings.gfl.amount}
-                    onChange={(value) => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, amount: value } })}
-                    containerStyle={{ marginBottom: 10 }}
-                    totalWidth={Dimensions.get("screen").width * 0.5}
-                    totalHeight={50}
-                />
             </View>
         )
     }
