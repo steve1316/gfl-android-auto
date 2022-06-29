@@ -11,6 +11,57 @@ class Operation(val game: Game) {
 	private var echelonDeploymentNumber: Int = 1
 
 	/**
+	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
+	 *
+	 */
+	fun prepareOperation() {
+		if (game.imageUtils.findImage(
+				"start_operation",
+				tries = 30,
+				region = intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2)
+			) == null
+		) {
+			throw Exception("Game failed to load into the map.")
+		}
+
+		game.printToLog("\n* * * * * * * * * * * * * * * * *")
+		game.printToLog("[PREPARATION] Starting preparation for operation.")
+
+		SetupData.setupSteps.forEach { init ->
+			when (init.action) {
+				"pinch_in" -> {
+					game.printToLog("[PREPARATION] Zooming in the map now...")
+					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+					game.wait(2.0)
+				}
+				"pinch_out" -> {
+					game.printToLog("[PREPARATION] Zooming out the map now...")
+					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+					game.wait(2.0)
+				}
+				"deploy_dummy" -> {
+					game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})")
+					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+					game.wait(1.0)
+					deployEchelon(echelonDeploymentNumber)
+				}
+				"deploy_echelon" -> {
+					game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})")
+					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+					game.wait(1.0)
+					deployEchelon(echelonDeploymentNumber)
+				}
+				else -> {
+					throw Exception("Invalid action")
+				}
+			}
+		}
+
+		game.printToLog("\n[PREPARATION] Finished preparation for operation.")
+		game.printToLog("* * * * * * * * * * * * * * * * *")
+	}
+
+	/**
 	 * Deploys a echelon on the already selected node.
 	 *
 	 * @param echelonNumber The required echelon to deploy.
@@ -66,58 +117,6 @@ class Operation(val game: Game) {
 			echelonDeploymentNumber++
 			return game.findAndPress("choose_echelon_ok")
 		} else throw Exception("Failed to deploy echelon $echelonDeploymentNumber in preparation phase.")
-	}
-
-
-	/**
-	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
-	 *
-	 */
-	fun prepareOperation() {
-		if (game.imageUtils.findImage(
-				"start_operation",
-				tries = 30,
-				region = intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2)
-			) == null
-		) {
-			throw Exception("Game failed to load into the map.")
-		}
-
-		game.printToLog("\n* * * * * * * * * * * * * * * * *")
-		game.printToLog("[PREPARATION] Starting preparation for operation.")
-
-		SetupData.setupSteps.forEach { init ->
-			when (init.action) {
-				"pinch_in" -> {
-					game.printToLog("[PREPARATION] Zooming in the map now...")
-					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
-				}
-				"pinch_out" -> {
-					game.printToLog("[PREPARATION] Zooming out the map now...")
-					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
-				}
-				"deploy_dummy" -> {
-					game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})")
-					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
-					game.wait(1.0)
-					deployEchelon(echelonDeploymentNumber)
-				}
-				"deploy_echelon" -> {
-					game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})")
-					game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
-					game.wait(1.0)
-					deployEchelon(echelonDeploymentNumber)
-				}
-				else -> {
-					throw Exception("Invalid action")
-				}
-			}
-		}
-
-		game.printToLog("\n[PREPARATION] Finished preparation for operation.")
-		game.printToLog("* * * * * * * * * * * * * * * * *")
 	}
 
 	/**
