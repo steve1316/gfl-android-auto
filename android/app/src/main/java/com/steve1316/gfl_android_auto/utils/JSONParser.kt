@@ -151,5 +151,23 @@ class JSONParser {
 		} catch (e: Exception) {
 			Log.e(loggerTag, "[ERROR] Parsing setup steps: $e")
 		}
+
+		try {
+			val moveObj = mapObj.getJSONObject("moves")
+			PlanningModeData.moves.clear()
+			moveObj.keys().forEach { key ->
+				val jsonObj = moveObj.get(key) as JSONObject
+				@Suppress("UNCHECKED_CAST")
+				PlanningModeData.moves.add(
+					PlanningModeData.Companion.Moves(
+						jsonObj.getString("action"),
+						toIntArrayList(jsonObj.get("coordinates") as JSONArray)
+					)
+				)
+			}
+			Log.d(loggerTag, "[DEBUG] Move steps: ${PlanningModeData.moves}")
+		} catch (e: Exception) {
+			Log.e(loggerTag, "[ERROR] Parsing move steps: $e")
+		}
 	}
 }
