@@ -91,7 +91,7 @@ const Settings = () => {
                 />
 
                 {bsc.settings.gfl.map !== "" ? (
-                    <View style={{ height: 200 }}>
+                    <View style={{ height: Dimensions.get("screen").height / 3, borderWidth: 1, flexShrink: 1 }}>
                         <ReactNativeZoomableView maxZoom={2.0} minZoom={0.5} zoomStep={1.0} initialZoom={1} pinchToZoomInSensitivity={0} pinchToZoomOutSensitivity={0} movementSensibility={3}>
                             <Image style={{ width: "100%", height: "100%", resizeMode: "contain" }} source={maps[bsc.settings.gfl.map]} />
                         </ReactNativeZoomableView>
