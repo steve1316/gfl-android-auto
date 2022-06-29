@@ -12,6 +12,8 @@ export interface Settings {
         amount: number
         dummyEchelons: number[]
         dpsEchelons: number[]
+        debugMode: boolean
+        enableSetup: boolean
     }
 
     android: {
@@ -36,6 +38,8 @@ export const defaultSettings: Settings = {
         amount: 1,
         dummyEchelons: [],
         dpsEchelons: [],
+        debugMode: false,
+        enableSetup: false,
     },
     android: {
         enableDelayTap: false,

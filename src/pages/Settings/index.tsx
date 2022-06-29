@@ -188,12 +188,36 @@ const Settings = () => {
         )
     }
 
+    const renderMiscSettings = () => {
+        return (
+            <View>
+                <TitleDivider title="Misc Settings" subtitle="Below are miscelleneous settings mainly for debugging purposes." hasIcon={true} iconName="content-save-cog" iconColor="#000" />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.debugMode}
+                    onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, debugMode: !bsc.settings.gfl.debugMode } })}
+                    text="Enable Debug Mode"
+                    subtitle="Check this to enable more detailed log messages."
+                />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.enableSetup}
+                    onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup } })}
+                    text="Enable Setup Mode"
+                    subtitle="Check this to enable setting up a new map to support by following zoom instructions in the specified map's .json file and taking 5 screenshots to be saved to the /temp/ folder. It can then be used to manually determine point locations. Development purposes only."
+                />
+            </View>
+        )
+    }
+
     return (
         <View style={styles.root}>
             <ScrollView>
                 {renderMapSettings()}
 
                 {renderEchelonSettings()}
+
+                {renderMiscSettings()}
 
                 {renderDiscordSettings()}
             </ScrollView>
