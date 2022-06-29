@@ -128,7 +128,9 @@ class JSONParser {
 	 * @param myContext The application context.
 	 */
 	private fun loadMap(mapName: String, myContext: Context) {
-		val mapString = myContext.assets?.open("maps/$mapName.json")?.bufferedReader().use { it?.readText() } ?: throw Exception("Could not load map data for $mapName.")
+		MediaProjectionService.forceGenerateVirtualDisplay(myContext)
+		val fileName = if (MediaProjectionService.displayWidth == 1920) "${mapName}_1920.json" else "$mapName.json"
+		val mapString = myContext.assets?.open("maps/$fileName")?.bufferedReader().use { it?.readText() } ?: throw Exception("Could not load map data from the $fileName file.")
 		val mapObj = JSONObject(mapString)
 
 		try {
