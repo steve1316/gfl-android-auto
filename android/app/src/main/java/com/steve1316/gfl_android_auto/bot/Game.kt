@@ -196,10 +196,7 @@ class Game(private val myContext: Context) {
 			wait(3.0)
 
 			// Now prepare for the operation by deploying the necessary echelons.
-			op.prepareOperation()
-
-			// Now that the echelons are deployed, start the operation.
-			findAndPress("start_operation")
+			op.prepareAndStartOperation()
 
 			// Setup the moves in Planning Mode.
 			op.setupPlanningMode()

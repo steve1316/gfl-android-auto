@@ -15,7 +15,7 @@ class Operation(val game: Game) {
 	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
 	 *
 	 */
-	fun prepareOperation() {
+	fun prepareAndStartOperation() {
 		if (game.imageUtils.findImage(
 				"start_operation",
 				tries = 30,
@@ -65,6 +65,9 @@ class Operation(val game: Game) {
 
 		game.printToLog("\n[PREPARATION] Finished preparation for operation.", tag = tag)
 		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
+
+		// Now that the echelons are deployed, start the operation.
+		game.findAndPress("start_operation", tries = 30)
 	}
 
 	/**
