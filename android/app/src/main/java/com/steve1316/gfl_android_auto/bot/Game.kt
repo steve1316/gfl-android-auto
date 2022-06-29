@@ -185,11 +185,9 @@ class Game(private val myContext: Context) {
 			printToLog("\n[INFO] I am starting here!!!")
 		}
 
+		// Start the logic loop here.
 		var failureTries = 5
 		while (runsCompleted <= configData.amount) {
-			// Start the logic loop here.
-			val prevRunsCompleted = runsCompleted
-
 			// Navigate to the map.
 			// TODO: Cover all instances where the bot might be anywhere in the app. It must get to the home screen first before continuing.
 			nav.enterMap(configData.mapName)
@@ -202,9 +200,9 @@ class Game(private val myContext: Context) {
 			op.setupPlanningMode()
 
 			// Finally, execute Planning Mode.
-			op.executeOperation()
-
-			if (prevRunsCompleted == runsCompleted) {
+			if (op.executeOperation()) {
+				runsCompleted += 1
+			} else {
 				Log.d(loggerTag, "[DEBUG] The bot did not complete a run. $failureTries tries left before stopping the bot.")
 				failureTries -= 1
 				if (failureTries < 0) throw Exception("Bot failed 5 times to complete any run.")

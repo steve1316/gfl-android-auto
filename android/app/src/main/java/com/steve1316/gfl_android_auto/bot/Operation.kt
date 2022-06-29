@@ -177,13 +177,14 @@ class Operation(val game: Game) {
 	/**
 	 * Executes the Planning Mode and wait for the operation to end after some time of inactivity.
 	 *
+	 * @return True if the bot finished up with pressing the End Round button itself at the end of all of the checks.
 	 */
-	fun executeOperation() {
+	fun executeOperation(): Boolean {
 		// Press the button to execute the plan.
-		game.findAndPress("planning_mode_execute_plan")
-		game.printToLog("\n[EXECUTE_PLAN] Planning Mode is now being executed. Waiting for operation to end...")
+		game.findAndPress("planning_mode_execute_plan", tries = 30)
+		game.printToLog("\n[EXECUTE_PLAN] Planning Mode is now being executed. Waiting for operation to end...", tag = tag)
 
-		var tries = 10
+		var tries = 3
 		while (tries > 0) {
 			// If the End Round button vanished, then the bot might be in combat so wait for it to end before retrying checks.
 			if (game.imageUtils.waitVanish(
@@ -191,8 +192,8 @@ class Operation(val game: Game) {
 					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), timeout = 3, suppressError = true
 				)
 			) {
-				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting 30 seconds for it to end before retrying checks...")
-				tries = 10
+				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting 30 seconds for it to end before retrying checks...", tag = tag)
+				tries = 3
 				game.wait(30.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
@@ -201,5 +202,6 @@ class Operation(val game: Game) {
 		}
 
 		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
+		return (game.findAndPress("end_round"))
 	}
 }
