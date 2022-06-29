@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import com.steve1316.gfl_android_auto.data.PlanningModeData
 import com.steve1316.gfl_android_auto.data.SetupData
 import org.json.JSONArray
 import org.json.JSONObject
@@ -34,7 +35,6 @@ class JSONParser {
 
 		try {
 			val discordObj = jObj.getJSONObject("discord")
-
 			sharedPreferences.edit {
 				discordObj.keys().forEach { key ->
 					when (key) {
@@ -59,6 +59,8 @@ class JSONParser {
 				putInt("amount", gflObj.getInt("amount"))
 				putString("dummyEchelons", toIntArrayList(gflObj.getJSONArray("dummyEchelons")).joinToString("|"))
 				putString("dpsEchelons", toIntArrayList(gflObj.getJSONArray("dpsEchelons")).joinToString("|"))
+				putBoolean("debugMode", gflObj.getBoolean("debugMode"))
+				putBoolean("enableSetup", gflObj.getBoolean("enableSetup"))
 				commit()
 			}
 

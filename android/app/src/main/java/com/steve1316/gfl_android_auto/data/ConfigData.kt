@@ -16,6 +16,7 @@ class ConfigData(myContext: Context) {
 	val amount: Int
 	val dummyEchelons: List<String>
 	val dpsEchelons: List<String>
+	val enableSetup: Boolean
 
 	// Discord
 	val enableDiscordNotifications: Boolean
@@ -41,6 +42,7 @@ class ConfigData(myContext: Context) {
 		amount = sharedPreferences.getInt("amount", 1)
 		dummyEchelons = sharedPreferences.getString("dummyEchelons", "")!!.split("|")
 		dpsEchelons = sharedPreferences.getString("dpsEchelons", "")!!.split("|")
+		enableSetup = sharedPreferences.getBoolean("enableSetup", false)
 
 		// Token and user ID for use with the Discord API.
 		enableDiscordNotifications = sharedPreferences.getBoolean("enableDiscordNotifications", false)
