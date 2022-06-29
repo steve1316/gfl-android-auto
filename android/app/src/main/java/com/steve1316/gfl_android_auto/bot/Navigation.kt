@@ -7,6 +7,8 @@ import org.opencv.core.Point
  *
  */
 class Navigation(val game: Game) {
+	private val tag = "[Navigation]"
+
 	/**
 	 * Starts the process to verify and/or enter the correct map.
 	 *
@@ -30,9 +32,9 @@ class Navigation(val game: Game) {
 		// First check if the bot is at the correct episode. If not, navigate to it.
 		val epLocation = game.imageUtils.findImage("ep$episodeString", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
 		if (epLocation != null) {
-			game.printToLog("\n[INFO] We are at the correct episode.")
+			game.printToLog("\n[INFO] We are at the correct episode.", tag = tag)
 		} else {
-			game.printToLog("\n[INFO] Bot is not at the correct episode. Navigating to Episode $episodeString...")
+			game.printToLog("\n[INFO] Bot is not at the correct episode. Navigating to Episode $episodeString...", tag = tag)
 			val chapterNumber: Int = mapName.split("-")[0].toInt()
 			navigateToCorrectEpisode(episodeString, chapterNumber) ?: throw Exception("Bot could not find the correct episode at the end.")
 		}
@@ -58,13 +60,13 @@ class Navigation(val game: Game) {
 
 			if (chapterButtonPairLocation.first == -1 || chapterButtonPairLocation.second == null) throw Exception("Bot could not seem to find any episode locations.")
 			else if (chapterButtonPairLocation.first < chapterNumber) {
-				game.printToLog("[INFO] Nearest chapter button of ${chapterButtonPairLocation.second} is less than the required chapter number so scrolling the list down.")
+				game.printToLog("[INFO] Nearest chapter button of ${chapterButtonPairLocation.second} is less than the required chapter number so scrolling the list down.", tag = tag)
 				game.gestureUtils.swipe(
 					chapterButtonPairLocation.second!!.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, chapterButtonPairLocation.second!!.x.toFloat(),
 					(MediaProjectionService.displayHeight.toFloat() / 2) - 400
 				)
 			} else {
-				game.printToLog("[INFO] Nearest chapter button of ${chapterButtonPairLocation.second} is more than the required chapter number so scrolling the list up.")
+				game.printToLog("[INFO] Nearest chapter button of ${chapterButtonPairLocation.second} is more than the required chapter number so scrolling the list up.", tag = tag)
 				game.gestureUtils.swipe(
 					chapterButtonPairLocation.second!!.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, chapterButtonPairLocation.second!!.x.toFloat(),
 					(MediaProjectionService.displayHeight.toFloat() / 2) + 400

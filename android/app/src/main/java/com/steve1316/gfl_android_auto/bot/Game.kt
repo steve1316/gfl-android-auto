@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * Main driver for bot activity and navigation.
  */
 class Game(private val myContext: Context) {
-	private val tag: String = "${loggerTag}Game"
+	private val tag: String = "Game"
 
 	private val startTime: Long = System.currentTimeMillis()
 
@@ -57,11 +57,11 @@ class Game(private val myContext: Context) {
 	 */
 	fun printToLog(message: String, tag: String = this.tag, isWarning: Boolean = false, isError: Boolean = false) {
 		if (!isError && isWarning) {
-			Log.w(tag, message)
+			Log.w("${loggerTag}${tag}", message)
 		} else if (isError && !isWarning) {
-			Log.e(tag, message)
+			Log.e("${loggerTag}${tag}", message)
 		} else {
-			Log.d(tag, message)
+			Log.d("${loggerTag}${tag}", message)
 		}
 
 		// Remove the newline prefix if needed and place it where it should be.

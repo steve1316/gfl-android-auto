@@ -8,6 +8,7 @@ import com.steve1316.gfl_android_auto.utils.MediaProjectionService
  * This class takes care of preparing for and executing operations including deploying echelons.
  */
 class Operation(val game: Game) {
+	private val tag = "[Operation]"
 	private var echelonDeploymentNumber: Int = 1
 
 	/**
@@ -24,18 +25,19 @@ class Operation(val game: Game) {
 			throw Exception("Game failed to load into the map.")
 		}
 
-		game.printToLog("\n* * * * * * * * * * * * * * * * *")
-		game.printToLog("[PREPARATION] Starting preparation for operation.")
+		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
+		game.printToLog("[PREPARATION] Starting preparation for operation.", tag = tag)
 
 		SetupData.setupSteps.forEach { init ->
+			if (game.configData.debugMode) game.printToLog("[DEBUG] Setup executing: $init", tag = tag)
 			when (init.action) {
 				"pinch_in" -> {
-					game.printToLog("[PREPARATION] Zooming in the map now...")
+					game.printToLog("[PREPARATION] Zooming in the map now...", tag = tag)
 					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
 					game.wait(2.0)
 				}
 				"pinch_out" -> {
-					game.printToLog("[PREPARATION] Zooming out the map now...")
+					game.printToLog("[PREPARATION] Zooming out the map now...", tag = tag)
 					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
 					game.wait(2.0)
 				}
@@ -57,8 +59,8 @@ class Operation(val game: Game) {
 			}
 		}
 
-		game.printToLog("\n[PREPARATION] Finished preparation for operation.")
-		game.printToLog("* * * * * * * * * * * * * * * * *")
+		game.printToLog("\n[PREPARATION] Finished preparation for operation.", tag = tag)
+		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
 	}
 
 	/**
@@ -83,7 +85,7 @@ class Operation(val game: Game) {
 				// Scroll the echelon list up or down.
 				if (echelonLocation != null) {
 					if (tempEchelonNumber < echelonNumber) {
-						game.printToLog("[DEPLOY_ECHELON] Nearest echelon of $tempEchelonNumber is less than the required echelon number so scrolling the list down.")
+						game.printToLog("[DEPLOY_ECHELON] Nearest echelon of $tempEchelonNumber is less than the required echelon number so scrolling the list down.", tag = tag)
 						game.gestureUtils.swipe(
 							echelonLocation.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, echelonLocation.x.toFloat(),
 							(MediaProjectionService.displayHeight.toFloat() / 2) - 400
@@ -126,8 +128,9 @@ class Operation(val game: Game) {
 	fun setupPlanningMode() {
 		game.wait(2.0)
 
-		game.printToLog("\n= = = = = = = = = = = = = = = =")
-		game.printToLog("[SETUP_PLANNING_MODE] Laying out the moves for Planning Mode now...")
+		game.printToLog("\n= = = = = = = = = = = = = = = =", tag = tag)
+		game.printToLog("[SETUP_PLANNING_MODE] Laying out the moves for Planning Mode now...", tag = tag)
+
 
 		PlanningModeData.moves.forEach { move ->
 			when (move.action) {
@@ -153,8 +156,8 @@ class Operation(val game: Game) {
 			}
 		}
 
-		game.printToLog("\n[SETUP_PLANNING_MODE] Finished preparation for operation.")
-		game.printToLog("= = = = = = = = = = = = = = = =")
+		game.printToLog("\n[SETUP_PLANNING_MODE] Finished preparation for operation.", tag = tag)
+		game.printToLog("= = = = = = = = = = = = = = = =", tag = tag)
 	}
 
 	/**
@@ -178,11 +181,11 @@ class Operation(val game: Game) {
 				tries = 10
 				game.wait(30.0)
 			} else {
-				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.")
+				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
 				tries -= 1
 			}
 		}
 
-		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.")
+		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
 	}
 }
