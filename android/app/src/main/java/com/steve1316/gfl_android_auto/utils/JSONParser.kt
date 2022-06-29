@@ -57,14 +57,15 @@ class JSONParser {
 			sharedPreferences.edit {
 				putString("map", gflObj.getString("map"))
 				putInt("amount", gflObj.getInt("amount"))
-				putString("dummyEchelons", toStringArrayList(gflObj.getJSONArray("dummyEchelons")).joinToString("|"))
-				putString("dpsEchelons", toStringArrayList(gflObj.getJSONArray("dpsEchelons")).joinToString("|"))
+				putString("dummyEchelons", toIntArrayList(gflObj.getJSONArray("dummyEchelons")).joinToString("|"))
+				putString("dpsEchelons", toIntArrayList(gflObj.getJSONArray("dpsEchelons")).joinToString("|"))
 				commit()
 			}
 
 			// Load the map data.
 			loadMap(gflObj.getString("map"), myContext)
 		} catch (e: Exception) {
+			Log.e(loggerTag, "[ERROR] Parsing gfl OBJECT: $e")
 		}
 
 		try {
@@ -101,6 +102,24 @@ class JSONParser {
 	}
 
 	/**
+	 * Convert JSONArray to ArrayList<Int> object.
+	 *
+	 * @param jsonArray The JSONArray object to be converted.
+	 * @return The converted ArrayList<Int> object.
+	 */
+	private fun toIntArrayList(jsonArray: JSONArray): ArrayList<Int> {
+		val newArrayList: ArrayList<Int> = arrayListOf()
+
+		var i = 0
+		while (i < jsonArray.length()) {
+			newArrayList.add(jsonArray.get(i) as Int)
+			i++
+		}
+
+		return newArrayList
+	}
+
+	/**
 	 * Loads the map data which includes the initial setup steps and subsequent Planning Mode moves.
 	 *
 	 * @param mapName Name of the map to run.
@@ -116,9 +135,17 @@ class JSONParser {
 			initObj.keys().forEach { key ->
 				val jsonObj = initObj.get(key) as JSONObject
 				@Suppress("UNCHECKED_CAST")
-				SetupData.setupSteps.add(SetupData.Companion.Init(jsonObj.getString("action"), jsonObj.get("spacing") as ArrayList<Int>, jsonObj.get("coordinates") as ArrayList<Int>))
+				SetupData.setupSteps.add(
+					SetupData.Companion.Init(
+						jsonObj.getString("action"),
+						toIntArrayList(jsonObj.get("spacing") as JSONArray),
+						toIntArrayList(jsonObj.get("coordinates") as JSONArray)
+					)
+				)
 			}
+			Log.d(loggerTag, "[DEBUG] Setup steps: ${SetupData.setupSteps}")
 		} catch (e: Exception) {
+			Log.e(loggerTag, "[ERROR] Parsing setup steps: $e")
 		}
 	}
 }
