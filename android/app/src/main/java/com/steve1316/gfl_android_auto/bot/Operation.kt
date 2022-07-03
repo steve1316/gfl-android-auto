@@ -17,6 +17,8 @@ class Operation(val game: Game) {
 	 *
 	 */
 	fun prepareAndStartOperation() {
+		game.wait(3.0)
+
 		if (game.imageUtils.findImage(
 				"start_operation",
 				tries = 30,
@@ -69,6 +71,7 @@ class Operation(val game: Game) {
 
 		// Now that the echelons are deployed, start the operation.
 		game.findAndPress("start_operation", tries = 30)
+		game.wait(3.0)
 	}
 
 	/**
@@ -189,19 +192,26 @@ class Operation(val game: Game) {
 			// If the End Round button vanished, then the bot might be in combat so wait for it to end before retrying checks.
 			if (game.imageUtils.waitVanish(
 					"end_round", region =
-					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), timeout = 3, suppressError = true
+					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), timeout = 2, suppressError = true
 				)
 			) {
-				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting 30 seconds for it to end before retrying checks...", tag = tag)
+				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting several seconds for it to end before retrying checks...", tag = tag)
 				tries = 3
-				game.wait(30.0)
+				game.wait(5.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
+				game.wait(2.0)
 				tries -= 1
 			}
 		}
 
 		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
-		return (game.findAndPress("end_round"))
+		val result = game.findAndPress("end_round")
+		return if (result) {
+			game.wait(10.0)
+			result
+		} else {
+			result
+		}
 	}
 }
