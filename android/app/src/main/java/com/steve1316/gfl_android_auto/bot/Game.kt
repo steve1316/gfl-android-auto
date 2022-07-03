@@ -26,6 +26,7 @@ class Game(private val myContext: Context) {
 	val gestureUtils: MyAccessibilityService = MyAccessibilityService.getInstance()
 	private val nav: Navigation = Navigation(this)
 	private val op: Operation = Operation(this)
+	private val factory: Factory = Factory(this)
 	var runsCompleted = 0
 	val maxChapterNumber: Int = 11
 	var is1920 = false
@@ -166,6 +167,63 @@ class Game(private val myContext: Context) {
 	}
 
 	/**
+	 * Wait a hard coded amount of seconds to account for screen transition delays.
+	 *
+	 */
+	fun waitScreenTransition() {
+		wait(3.0)
+	}
+
+	/**
+	 * Back out of the current screen.
+	 *
+	 */
+	fun goBack() {
+		findAndPress("back", tries = 2)
+		waitScreenTransition()
+	}
+
+	/**
+	 * Checks if the bot is at the Home screen.
+	 *
+	 */
+	fun checkHomeScreen(): Boolean {
+		return imageUtils.findImage("home_combat", tries = 2) != null
+	}
+
+	/**
+	 * Checks if the bot is at the Combat screen.
+	 *
+	 */
+	fun checkCombatScreen(): Boolean {
+		return imageUtils.findImage("combat_screen", tries = 2) != null
+	}
+
+	/**
+	 * Checks if there are echelons to be repaired and repairs them using tickets.
+	 *
+	 * @return True if the bot repaired echelons.
+	 */
+	fun repair(): Boolean {
+		printToLog("\n[Repair] Starting process to repair echelons...")
+		val result: Boolean = if (findAndPress("repair", tries = 2)) {
+			waitScreenTransition()
+			findAndPress("repair_one_click")
+			wait(2.0)
+			printToLog("[Repair] Repair Bay entered. Repairing echelons using tickets now...")
+			findAndPress("repair_ok")
+		} else {
+			printToLog("[Repair] Repair Bay was not entered or no echelons need repairs. Moving on...")
+			false
+		}
+
+		wait(1.0)
+
+		goBack()
+		return result
+	}
+
+	/**
 	 * Bot will begin automation here.
 	 *
 	 * @return True if all automation goals have been met. False otherwise.
@@ -187,11 +245,32 @@ class Game(private val myContext: Context) {
 
 		// Start the logic loop here.
 		var failureTries = 5
-		while (runsCompleted <= configData.amount) {
+		while (runsCompleted < configData.amount) {
 			// Navigate to the map.
 			// TODO: Cover all instances where the bot might be anywhere in the app. It must get to the home screen first before continuing.
-			nav.enterMap(configData.mapName)
-			wait(3.0)
+			val skipLocationCheck = checkCombatScreen()
+			if (!skipLocationCheck) {
+				if (!checkHomeScreen()) {
+					printToLog("[ERROR] Failed to determine if the bot is at the Home screen. Stopping bot...", isError = true)
+					break
+				}
+
+				// Check if there are echelons that need repair.
+				repair()
+			}
+
+			nav.enterMap(configData.mapName, skipInitialLocationCheck = skipLocationCheck)
+			if (imageUtils.findImage("insufficient_slots", tries = 2) != null) {
+				// Handle the case where there are too many T-Dolls in the inventory.
+				val moveToLocations = imageUtils.findAll("dismantle_move_to", "images")
+				gestureUtils.tap(moveToLocations[1].x, moveToLocations[1].y, "dismantle_move_to")
+				waitScreenTransition()
+				factory.disassemble()
+				goBack()
+				continue
+			}
+
+			waitScreenTransition()
 
 			// Now prepare for the operation by deploying the necessary echelons.
 			op.prepareAndStartOperation()
@@ -201,6 +280,21 @@ class Game(private val myContext: Context) {
 
 			// Finally, execute Planning Mode.
 			if (op.executeOperation()) {
+				// Check if the operation ended in success or failure.
+				if (imageUtils.findImage("result_settlement", tries = 10) != null) {
+					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+					wait(2.0)
+					// TODO: Read name of final reward.
+					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+					wait(1.0)
+					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+					wait(1.0)
+					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+					wait(5.0)
+				} else {
+					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+				}
+
 				runsCompleted += 1
 			} else {
 				Log.d(loggerTag, "[DEBUG] The bot did not complete a run. $failureTries tries left before stopping the bot.")
