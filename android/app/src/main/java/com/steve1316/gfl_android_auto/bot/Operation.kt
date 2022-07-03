@@ -17,6 +17,8 @@ class Operation(val game: Game) {
 	 *
 	 */
 	fun prepareAndStartOperation() {
+		echelonDeploymentNumber = 1
+
 		game.wait(3.0)
 
 		if (game.imageUtils.findImage(
