@@ -27,6 +27,8 @@ class Game(private val myContext: Context) {
 	private val nav: Navigation = Navigation(this)
 	private val op: Operation = Operation(this)
 	private val factory: Factory = Factory(this)
+	val tdoll: TDoll = TDoll(this)
+
 	var runsCompleted = 0
 	val maxChapterNumber: Int = 11
 	var is1920 = false
@@ -283,8 +285,13 @@ class Game(private val myContext: Context) {
 				// Check if the operation ended in success or failure.
 				if (imageUtils.findImage("result_settlement", tries = 10) != null) {
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
-					wait(2.0)
-					// TODO: Read name of final reward.
+					wait(3.0)
+
+					// Start detection of acquired T-Doll.
+					printToLog("[INFO] Analyzing the final T-Doll reward...")
+					tdoll.startDetection()
+
+					// Now close out the screens.
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 					wait(1.0)
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
@@ -302,6 +309,8 @@ class Game(private val myContext: Context) {
 				if (failureTries < 0) throw Exception("Bot failed 5 times to complete any run.")
 			}
 		}
+
+		printToLog("\n[INFO] Acquired T-Dolls: ${tdoll.acquiredDolls}")
 
 		printToLog("\n[INFO] I am ending here!")
 

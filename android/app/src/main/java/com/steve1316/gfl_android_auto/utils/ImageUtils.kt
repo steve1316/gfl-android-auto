@@ -85,7 +85,7 @@ class ImageUtils(context: Context, private val game: Game) {
 		updateMatchFilePath(matchFilePath)
 
 		// Uncomment the below line to initialize Tesseract for the purposes of OCR text recognition.
-		// initTesseract("SET FILE NAME OF .TRAINEDDATA FOR TESSERACT INITIALIZATION HERE")
+		initTesseract("eng.traineddata")
 		tessBaseAPI = TessBaseAPI()
 	}
 
@@ -475,26 +475,27 @@ class ImageUtils(context: Context, private val game: Game) {
 	 * @param templateFolderName Name of the subfolder in /assets/ that the template image is in.
 	 * @return A Pair of source and template Bitmaps.
 	 */
-	private fun getBitmaps(templateName: String, templateFolderName: String): Pair<Bitmap?, Bitmap?> {
+	private fun getBitmaps(templateName: String? = null, templateFolderName: String? = null): Pair<Bitmap?, Bitmap?> {
 		var sourceBitmap: Bitmap? = null
 
 		// Keep swiping a little bit up and down to trigger a new image for ImageReader to grab.
 		while (sourceBitmap == null) {
 			sourceBitmap = MediaProjectionService.takeScreenshotNow()
 
-			if (sourceBitmap == null) {
-				game.gestureUtils.swipe(500f, 500f, 500f, 400f, 100L)
-				game.gestureUtils.swipe(500f, 400f, 500f, 500f, 100L)
-				game.wait(0.5)
-			}
+//			if (sourceBitmap == null) {
+//				game.gestureUtils.swipe(500f, 500f, 500f, 400f, 100L)
+//				game.gestureUtils.swipe(500f, 400f, 500f, 500f, 100L)
+//				game.wait(0.5)
+//			}
 		}
 
-		var templateBitmap: Bitmap?
-
-		// Get the Bitmap from the template image file inside the specified folder.
-		myContext.assets?.open("$templateFolderName/$templateName.webp").use { inputStream ->
-			// Get the Bitmap from the template image file and then start matching.
-			templateBitmap = BitmapFactory.decodeStream(inputStream)
+		var templateBitmap: Bitmap? = null
+		if (templateName != null && templateFolderName != null) {
+			// Get the Bitmap from the template image file inside the specified folder.
+			myContext.assets?.open("$templateFolderName/$templateName.webp").use { inputStream ->
+				// Get the Bitmap from the template image file and then start matching.
+				templateBitmap = BitmapFactory.decodeStream(inputStream)
+			}
 		}
 
 		return if (templateBitmap != null) {
@@ -811,22 +812,23 @@ class ImageUtils(context: Context, private val game: Game) {
 	 *
 	 * @return The detected String in the cropped region.
 	 */
-	fun findTextTesseract(): String {
-		val (_, _) = getBitmaps("", "")
+	fun findTextTesseract(x: Int, y: Int, width: Int, height: Int): String {
+		val sourceBitmap = MediaProjectionService.takeScreenshotNow(saveImage = true) ?: return ""
 
-		tessBaseAPI.init(myContext.getExternalFilesDir(null)?.absolutePath + "/tesseract/", "jpn")
+		tessBaseAPI.init(myContext.getExternalFilesDir(null)?.absolutePath + "/tesseract/", "eng")
 		game.printToLog("[INFO] Training file loaded.\n", tag = tag)
 
 		// Read in the new screenshot and crop it.
-		var cvImage = Imgcodecs.imread("$matchFilePath/source.png", Imgcodecs.IMREAD_GRAYSCALE)
-		cvImage = cvImage.submat(0, 500, 0, 500)
+		val croppedBitmap = Bitmap.createBitmap(sourceBitmap, x, y, width, height)
+		val cvImage = Mat()
+		Utils.bitmapToMat(croppedBitmap, cvImage)
 
 		// Save the cropped image before converting it to black and white in order to troubleshoot issues related to differing device sizes and cropping.
 		Imgcodecs.imwrite("$matchFilePath/pre_tesseract_result.png", cvImage)
 
 		// Thresh the grayscale cropped image to make black and white.
 		val bwImage = Mat()
-		Imgproc.threshold(cvImage, bwImage, 200.0, 255.0, Imgproc.THRESH_BINARY)
+		Imgproc.threshold(cvImage, bwImage, 130.0, 255.0, Imgproc.THRESH_BINARY)
 		Imgcodecs.imwrite("$matchFilePath/tesseract_result.png", bwImage)
 
 		val resultBitmap = BitmapFactory.decodeFile("$matchFilePath/tesseract_result.png")
@@ -843,7 +845,7 @@ class ImageUtils(context: Context, private val game: Game) {
 			game.printToLog("[ERROR] Cannot perform OCR: ${e.stackTraceToString()}", tag = tag, isError = true)
 		}
 
-		tessBaseAPI.end()
+		tessBaseAPI.stop()
 
 		return result
 	}

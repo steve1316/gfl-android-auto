@@ -199,6 +199,7 @@ class Operation(val game: Game) {
 			) {
 				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting several seconds for it to end before retrying checks...", tag = tag)
 				tries = 3
+				game.tdoll.startDetection()
 				game.wait(5.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
