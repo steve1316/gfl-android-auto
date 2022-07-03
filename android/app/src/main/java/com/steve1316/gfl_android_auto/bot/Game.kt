@@ -146,7 +146,7 @@ class Game(private val myContext: Context) {
 	private fun dimensionCheck() {
 		is1920 = if (MediaProjectionService.displayWidth == 1920 && MediaProjectionService.displayHeight == 1080) {
 			true
-		} else if (MediaProjectionService.displayWidth == 2560 && MediaProjectionService.displayHeight == 1080) {
+		} else if (MediaProjectionService.displayWidth == 2400 && MediaProjectionService.displayHeight == 1080) {
 			false
 		} else {
 			throw Exception("Wrong system resolution set to ${MediaProjectionService.displayWidth}x${MediaProjectionService.displayHeight}. Note that supported dimensions are 1920x1080 and 2560x1080.")
@@ -207,22 +207,26 @@ class Game(private val myContext: Context) {
 	 * @return True if the bot repaired echelons.
 	 */
 	fun repair(): Boolean {
-		printToLog("\n[Repair] Starting process to repair echelons...")
-		val result: Boolean = if (findAndPress("repair", tries = 2)) {
-			waitScreenTransition()
-			findAndPress("repair_one_click")
-			wait(2.0)
-			printToLog("[Repair] Repair Bay entered. Repairing echelons using tickets now...")
-			findAndPress("repair_ok")
+		if (configData.enableRepair) {
+			printToLog("\n[Repair] Starting process to repair echelons...")
+			val result: Boolean = if (findAndPress("repair", tries = 2)) {
+				waitScreenTransition()
+				findAndPress("repair_one_click")
+				wait(2.0)
+				printToLog("[Repair] Repair Bay entered. Repairing echelons using tickets now...")
+				findAndPress("repair_ok")
+			} else {
+				printToLog("[Repair] Repair Bay was not entered or no echelons need repairs. Moving on...")
+				false
+			}
+
+			wait(1.0)
+
+			goBack()
+			return result
 		} else {
-			printToLog("[Repair] Repair Bay was not entered or no echelons need repairs. Moving on...")
-			false
+			return false
 		}
-
-		wait(1.0)
-
-		goBack()
-		return result
 	}
 
 	/**
