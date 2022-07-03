@@ -197,13 +197,18 @@ class Operation(val game: Game) {
 					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), timeout = 2, suppressError = true
 				)
 			) {
-				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting several seconds for it to end before retrying checks...", tag = tag)
+				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting for combat end before retrying checks...", tag = tag)
 				tries = 3
+
+				// Wait until combat ends.
+				while (!game.imageUtils.waitVanish("combat_pause", timeout = 1, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))) {
+					game.wait(0.5)
+				}
+
 				game.tdoll.startDetection()
 				game.wait(5.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
-				game.wait(2.0)
 				tries -= 1
 			}
 		}
