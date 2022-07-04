@@ -61,6 +61,8 @@ class JSONParser {
 				putString("dpsEchelons", toIntArrayList(gflObj.getJSONArray("dpsEchelons")).joinToString("|"))
 				putBoolean("debugMode", gflObj.getBoolean("debugMode"))
 				putBoolean("enableSetup", gflObj.getBoolean("enableSetup"))
+				putBoolean("enableRepair", gflObj.getBoolean("enableRepair"))
+				putInt("repairInterval", gflObj.getInt("repairInterval"))
 				commit()
 			}
 
