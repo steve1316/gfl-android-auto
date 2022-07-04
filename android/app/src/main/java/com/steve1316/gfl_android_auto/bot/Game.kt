@@ -320,12 +320,12 @@ class Game(private val myContext: Context) {
 
 		val endTime: Long = System.currentTimeMillis()
 		val runTime: Long = endTime - startTime
-		printToLog("Total Runtime: ${runTime}ms")
+		printToLog("[INFO] Total Runtime: ${runTime}ms or ${printTime()}")
 
 		val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(myContext)
 		if (sharedPreferences.getBoolean("enableDiscordNotifications", false)) {
 			wait(1.0)
-			DiscordUtils.queue.add("Total Runtime: ${runTime}ms")
+			DiscordUtils.queue.add("Total Runtime: ${runTime}ms or ${printTime()}")
 			wait(1.0)
 		}
 
