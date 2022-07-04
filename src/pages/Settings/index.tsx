@@ -188,6 +188,41 @@ const Settings = () => {
         )
     }
 
+    const renderRepairSettings = () => {
+        return (
+            <View>
+                <TitleDivider title="Repair Settings" subtitle="Control the behavior of the repair functionality." hasIcon={true} iconName="hammer-wrench" iconColor="#000" />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.enableRepair}
+                    onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableRepair: !bsc.settings.gfl.enableRepair } })}
+                    text="Enable Repair"
+                    subtitle="Check this to enable repairing of echelons using quick repair tickets."
+                />
+
+                {bsc.settings.gfl.enableRepair ? (
+                    <View>
+                        <Text style={{ marginTop: 10, marginBottom: 10 }}>Set how many runs should be completed before the bot stops and go repair the echelons</Text>
+                        <NumericInput
+                            type="plus-minus"
+                            leftButtonBackgroundColor="#eb5056"
+                            rightButtonBackgroundColor="#EA3788"
+                            rounded
+                            valueType="integer"
+                            minValue={1}
+                            maxValue={20}
+                            value={bsc.settings.gfl.repairInterval}
+                            onChange={(value) => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, repairInterval: value } })}
+                            containerStyle={{ marginBottom: 10 }}
+                            totalWidth={Dimensions.get("screen").width * 0.5}
+                            totalHeight={50}
+                        />
+                    </View>
+                ) : null}
+            </View>
+        )
+    }
+
     const renderMiscSettings = () => {
         return (
             <View>
@@ -216,6 +251,8 @@ const Settings = () => {
                 {renderMapSettings()}
 
                 {renderEchelonSettings()}
+
+                {renderRepairSettings()}
 
                 {renderMiscSettings()}
 

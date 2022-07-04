@@ -14,6 +14,8 @@ export interface Settings {
         dpsEchelons: number[]
         debugMode: boolean
         enableSetup: boolean
+        enableRepair: boolean
+        repairInterval: number
     }
 
     android: {
@@ -40,6 +42,8 @@ export const defaultSettings: Settings = {
         dpsEchelons: [],
         debugMode: false,
         enableSetup: false,
+        enableRepair: true,
+        repairInterval: 3,
     },
     android: {
         enableDelayTap: false,
