@@ -248,7 +248,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:18.0.0'
 
     // Tesseract4Android for OCR text recognition.
-    implementation 'cz.adaptech.android:tesseract4android:2.1.1'
+    implementation 'cz.adaptech:tesseract4android:4.1.1'
 
     // Twitter4j is used to connect to the Twitter API.
     implementation 'org.twitter4j:twitter4j-stream:4.0.7'
