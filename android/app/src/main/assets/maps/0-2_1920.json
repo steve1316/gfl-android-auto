@@ -11,21 +11,11 @@
             "coordinates": []
         },
         "3": {
-            "action": "pinch_out",
-            "spacing": [1000, 100],
-            "coordinates": []
-        },
-        "4": {
-            "action": "pinch_out",
-            "spacing": [1000, 100],
-            "coordinates": []
-        },
-        "5": {
             "action": "deploy_dummy",
             "spacing": [],
             "coordinates": [590, 775]
         },
-        "6": {
+        "4": {
             "action": "deploy_echelon",
             "spacing": [],
             "coordinates": [975, 775]
