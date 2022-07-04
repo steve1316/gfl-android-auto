@@ -64,6 +64,8 @@ class ImageUtils(context: Context, private val game: Game) {
 	////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////
 
+	private var mostRecent = 1
+
 	companion object {
 		private var matchFilePath: String = ""
 		private lateinit var matchLocation: Point
@@ -816,7 +818,7 @@ class ImageUtils(context: Context, private val game: Game) {
 		val sourceBitmap = MediaProjectionService.takeScreenshotNow(saveImage = true) ?: return ""
 
 		tessBaseAPI.init(myContext.getExternalFilesDir(null)?.absolutePath + "/tesseract/", "eng")
-		game.printToLog("[INFO] Training file loaded.\n", tag = tag)
+		game.printToLog("\n[TESSERACT] Starting text detection now...", tag = tag)
 
 		// Read in the new screenshot and crop it.
 		val croppedBitmap = Bitmap.createBitmap(sourceBitmap, x, y, width, height)
@@ -824,14 +826,14 @@ class ImageUtils(context: Context, private val game: Game) {
 		Utils.bitmapToMat(croppedBitmap, cvImage)
 
 		// Save the cropped image before converting it to black and white in order to troubleshoot issues related to differing device sizes and cropping.
-		Imgcodecs.imwrite("$matchFilePath/pre_tesseract_result.png", cvImage)
+		Imgcodecs.imwrite("$matchFilePath/tesseract_result_${mostRecent}_a.png", cvImage)
 
 		// Thresh the grayscale cropped image to make black and white.
 		val bwImage = Mat()
 		Imgproc.threshold(cvImage, bwImage, 130.0, 255.0, Imgproc.THRESH_BINARY)
-		Imgcodecs.imwrite("$matchFilePath/tesseract_result.png", bwImage)
+		Imgcodecs.imwrite("$matchFilePath/tesseract_result_${mostRecent}_b.png", bwImage)
 
-		val resultBitmap = BitmapFactory.decodeFile("$matchFilePath/tesseract_result.png")
+		val resultBitmap = BitmapFactory.decodeFile("$matchFilePath/tesseract_result_${mostRecent}_b.png")
 		tessBaseAPI.setImage(resultBitmap)
 
 		// Set the Page Segmentation Mode to '--psm 7' or "Treat the image as a single text line" according to https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html#page-segmentation-method
@@ -846,6 +848,13 @@ class ImageUtils(context: Context, private val game: Game) {
 		}
 
 		tessBaseAPI.stop()
+
+		mostRecent++
+		if (mostRecent > 5) {
+			mostRecent = 1
+		}
+
+		game.printToLog("[TESSERACT] Text detection finished.", tag = tag)
 
 		return result
 	}
