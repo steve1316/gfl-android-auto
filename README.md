@@ -19,10 +19,15 @@ This application is developed with educational purposes in mind while exploring 
 
 -   [ ] Run a variety of maps to farm EXP and Cores.
     -   [x] 0-2
-    -   [ ] TODO
+    -   [ ] 2-3
+    -   [ ] 4-3e
+    -   [ ] 5-2e
+    -   [ ] 0-4
+    -   [ ] 11-5
 -   [x] Use specified Dummy and DPS Echelons.
     -   [ ] Swaps out DPS between Echelons for Corpse Dragging.
--   [ ] Enhance/Dismantle excess T-Dolls.
+-   [x] ~~Enhance~~/Dismantle excess T-Dolls.
+-   [x] Detect what T-Doll dropped as a reward during combat/operation end via Tesseract OCR.
 -   [ ] Optional Discord integration for status and T-Doll alerts.
 -   [ ] Optional integration with website (pending name and development) for statistical analysis like [Granblue Automation Statistics](https://granblue-automation-statistics.com/)
 
