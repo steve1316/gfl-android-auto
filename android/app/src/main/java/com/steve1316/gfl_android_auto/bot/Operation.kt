@@ -48,6 +48,24 @@ class Operation(val game: Game) {
 					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
 					game.wait(2.0)
 				}
+				"swipe_up" -> {
+					game.printToLog("[PREPARATION] Swiping the map up now...", tag = tag)
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+						MediaProjectionService.displayWidth.toFloat() / 2,
+						(MediaProjectionService.displayHeight.toFloat() / 2) + init.spacing[0].toFloat()
+					)
+					game.wait(2.0)
+				}
+				"swipe_down" -> {
+					game.printToLog("[PREPARATION] Swiping the map down now...", tag = tag)
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+						MediaProjectionService.displayWidth.toFloat() / 2,
+						(MediaProjectionService.displayHeight.toFloat() / 2) - init.spacing[0].toFloat()
+					)
+					game.wait(2.0)
+				}
 				"deploy_dummy" -> {
 					if (!game.configData.enableSetup) {
 						game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
@@ -65,7 +83,7 @@ class Operation(val game: Game) {
 					}
 				}
 				else -> {
-					throw Exception("Invalid action")
+					throw Exception("Invalid action. Available actions are: pinch_in, pinch_out, swipe_up, swipe_down, deploy_dummy, deploy_echelon")
 				}
 			}
 		}
