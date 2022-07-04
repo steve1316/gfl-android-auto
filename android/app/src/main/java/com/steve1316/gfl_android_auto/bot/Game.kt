@@ -154,10 +154,11 @@ class Game(private val myContext: Context) {
 	}
 
 	/**
-	 * Takes 5 screenshots back to back.
+	 * Starts the process to start taking setup screenshots.
 	 *
 	 */
 	private fun takeSetupScreenshots() {
+		op.prepareAndStartOperation()
 		var tries = 1
 		while (tries <= 5) {
 			val result: Boolean = imageUtils.saveScreenshot("$tries")
@@ -247,6 +248,11 @@ class Game(private val myContext: Context) {
 			printToLog("\n[DEBUG] I am starting here but as a debugging message!")
 		} else {
 			printToLog("\n[INFO] I am starting here!!!")
+		}
+
+		if (configData.enableSetup) {
+			takeSetupScreenshots()
+			return true
 		}
 
 		// Start the logic loop here.

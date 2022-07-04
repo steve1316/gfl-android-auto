@@ -19,7 +19,9 @@ class Operation(val game: Game) {
 	fun prepareAndStartOperation() {
 		echelonDeploymentNumber = 1
 
-		game.wait(3.0)
+		if (!game.configData.enableSetup) {
+			game.wait(3.0)
+		}
 
 		if (game.imageUtils.findImage(
 				"start_operation",
@@ -72,8 +74,10 @@ class Operation(val game: Game) {
 		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
 
 		// Now that the echelons are deployed, start the operation.
-		game.findAndPress("start_operation", tries = 30)
-		game.wait(3.0)
+		if (!game.configData.enableSetup) {
+			game.findAndPress("start_operation", tries = 30)
+			game.wait(3.0)
+		}
 	}
 
 	/**
