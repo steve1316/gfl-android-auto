@@ -5,13 +5,22 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.steve1316.gfl_android_auto.MainActivity.loggerTag
+import org.json.JSONArray
 
 class ConfigData(myContext: Context) {
 	private val tag = "${loggerTag}ConfigData"
 
+	data class TDollInterface(
+		val id: Int,
+		val name: String,
+		val type: String,
+		val rarity: Int
+	)
+
 	val debugMode: Boolean
 
 	// GFL
+	val tdolls: ArrayList<TDollInterface> = arrayListOf()
 	val mapName: String
 	val amount: Int
 	val dummyEchelons: List<String>
@@ -61,5 +70,23 @@ class ConfigData(myContext: Context) {
 		customScale = sharedPreferences.getFloat("customScale", 1.0f).toDouble()
 
 		Log.d(tag, "Successfully loaded settings from SharedPreferences to memory.")
+
+		// Grab the JSON object from the file.
+		Log.d(tag, "Now loading tdolls from the tdolls.json file...")
+		val tdollString = myContext.assets.open("data/tdolls.json").bufferedReader().use { it.readText() }
+		val tdollArray = JSONArray(tdollString)
+
+		var i = 0
+		while (i < tdollArray.length()) {
+			val tdollObj = tdollArray.getJSONObject(i)
+			if (tdollObj["id"] != "") {
+				val tdoll = TDollInterface(tdollObj["id"].toString().toInt(), tdollObj["name"] as String, tdollObj["type"] as String, tdollObj["rarity"].toString().toInt())
+				tdolls.add(tdoll)
+			}
+
+			i++
+		}
+
+		Log.d(tag, "Loaded ${tdolls.size} T-Dolls from the tdolls.json file.")
 	}
 }

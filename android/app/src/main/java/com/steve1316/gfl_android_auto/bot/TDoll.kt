@@ -7,9 +7,9 @@ import info.debatty.java.stringsimilarity.JaroWinkler
  * This class handles text detection to determine what T-Doll dropped.
  */
 class TDoll(val game: Game) {
-	val acquiredDolls = arrayListOf<String>()
+	private val tag = "TDoll"
 
-	private val listOfDolls = arrayListOf("L85A1", "MP-446", "SVT-38", "FN FNP9", "SIG-510", "M38", "SKS", "DP28", "MG42", "Spectre M4", "Galil", "")
+	val acquiredDolls = arrayListOf<String>()
 
 	/**
 	 * Starts the text detection on the T-Doll screen after combat or operation end.
@@ -19,19 +19,19 @@ class TDoll(val game: Game) {
 	fun startDetection(): String {
 		val shareLocation = game.imageUtils.findImage("tdoll_share", tries = 5, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))
 		return if (shareLocation != null) {
-			game.printToLog("\n[DETECTION] T-Doll is on screen. Now attempting to determine name of T-Doll...")
+			game.printToLog("\n[DETECTION] T-Doll is on screen. Now attempting to determine name of T-Doll...", tag = tag)
 			var result = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90)
 			if (result == "") {
-				game.printToLog("[DETECTION] Detected nothing. Trying one more time...")
+				game.printToLog("[DETECTION] Detected nothing. Trying one more time...", tag = tag)
 				game.wait(0.5)
 				result = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90)
 			}
 
 			val similarityObj = calculateSimilarity(result)
 
-			game.printToLog("[DETECTION] Detected text: $result most similar to ${similarityObj.first} with a score of ${similarityObj.second}\n")
+			game.printToLog("[DETECTION] Detected text: $result most similar to ${similarityObj.first} with a score of ${similarityObj.second}\n", tag = tag)
 
-			acquiredDolls.add(result)
+			acquiredDolls.add(similarityObj.first)
 			result
 		} else {
 			""
@@ -44,18 +44,18 @@ class TDoll(val game: Game) {
 	 * @param testString Detected text from Tesseract
 	 * @return Pair object of the most similar string with its similarity score.
 	 */
-	fun calculateSimilarity(testString: String): Pair<String, Double> {
+	private fun calculateSimilarity(testString: String): Pair<String, Double> {
 		var resultString = ""
 		var resultConfidence = 0.0
 
 		// Now determine text similarity.
 		val stringCompare = JaroWinkler()
 
-		listOfDolls.forEach { tdoll ->
-			val tempConfidence = stringCompare.similarity(tdoll, testString)
+		game.configData.tdolls.forEach { tdoll ->
+			val tempConfidence = stringCompare.similarity(tdoll.name, testString)
 			if (tempConfidence > resultConfidence) {
 				resultConfidence = tempConfidence
-				resultString = tdoll
+				resultString = tdoll.name
 			}
 		}
 
