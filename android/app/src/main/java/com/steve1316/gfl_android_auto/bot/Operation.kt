@@ -10,18 +10,18 @@ import org.opencv.core.Point
  */
 class Operation(val game: Game) {
 	private val tag = "[Operation]"
-	private var echelonDeploymentNumber: Int = 1
+	private var dummyDeploymentIndex: Int = 0
+	private var echelonDeploymentIndex: Int = 0
+	private var inactiveCorpseDragger: String = ""
+	private var activeCorpseDragger: String = ""
+	private var swapDraggerNow: Boolean = true
 
 	/**
 	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
 	 *
 	 */
 	fun prepareAndStartOperation() {
-		echelonDeploymentNumber = 1
-
-		if (!game.configData.enableSetup) {
-			game.wait(3.0)
-		}
+		if (!game.configData.enableSetup) game.wait(3.0)
 
 		if (game.imageUtils.findImage(
 				"start_operation",
@@ -71,7 +71,7 @@ class Operation(val game: Game) {
 						game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
-						deployEchelon(echelonDeploymentNumber)
+						if (selectEchelon(game.configData.dummyEchelons[dummyDeploymentIndex].toInt(), deployEchelon = true)) dummyDeploymentIndex++
 					}
 				}
 				"deploy_echelon" -> {
@@ -79,7 +79,7 @@ class Operation(val game: Game) {
 						game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
-						deployEchelon(echelonDeploymentNumber)
+						if (selectEchelon(game.configData.dummyEchelons[echelonDeploymentIndex].toInt(), deployEchelon = true)) echelonDeploymentIndex++
 					}
 				}
 				else -> {
@@ -99,12 +99,149 @@ class Operation(val game: Game) {
 	}
 
 	/**
-	 * Deploys a echelon on the already selected node.
+	 * Swap the corpse dragger T-Doll between the DPS and dummy echelons.
 	 *
-	 * @param echelonNumber The required echelon to deploy.
+	 */
+	fun swapCorpseDragger() {
+		// Enter the Formation screen.
+		if (game.configData.enableCorpseDrag && swapDraggerNow && game.findAndPress("echelon_formation")) {
+			game.waitScreenTransition()
+
+			game.printToLog("\n[SWAP] Swapping dragger between Dummy and DPS echelons now...", tag = tag)
+
+			val corpseDraggerLocation = findCorpseDraggerLocation()
+			if (corpseDraggerLocation == null) {
+				game.printToLog("[SWAP] Could not find the position of the corpse dragger ${game.configData.corpseDragger1} or ${game.configData.corpseDragger2}. " +
+						"Skipping corpse dragging...", tag = tag)
+				return
+			}
+
+			// Go to the Selection screen by tapping on the portrait of the corpse dragger.
+			game.gestureUtils.tap(corpseDraggerLocation.x, corpseDraggerLocation.y - 200, "node")
+			game.wait(1.0)
+
+			// Mark the other corpse dragger as the inactive one.
+			if (game.configData.corpseDragger1 == activeCorpseDragger) {
+				inactiveCorpseDragger = game.configData.corpseDragger2
+				activeCorpseDragger = game.configData.corpseDragger1
+			} else {
+				inactiveCorpseDragger = game.configData.corpseDragger1
+				activeCorpseDragger = game.configData.corpseDragger2
+			}
+
+			// Open the Filter By menu and fetch the data on the inactive corpse dragger.
+			game.findAndPress("echelon_filter_by")
+			val corpseDraggerData = game.configData.tdolls.find {
+				it.name == inactiveCorpseDragger
+			}
+
+			// Filter by the type of the inactive corpse dragger.
+			game.findAndPress("echelon_${corpseDraggerData?.type?.lowercase()}")
+			game.findAndPress("echelon_formation_filter_by_confirm")
+
+			// Now find all locations of Captains and perform OCR to determine the location of the Captain of the echelon to swap with.
+			var tries = 5
+			while (tries > 0) {
+				val captainLocations = game.imageUtils.findAll("echelon_captain")
+				var captainLocation: Point? = null
+				var isDone = false
+				captainLocations.forEach { location ->
+					if (!isDone) {
+						val name = game.imageUtils.findTextTesseract(location.x.toInt() + 31, location.y.toInt() - 10, 165, 40)
+						var result = game.tdoll.calculateSimilarity(name)
+						if (game.configData.debugMode) game.printToLog("[DEBUG] Initial detection of ${result.first}, confidence = ${result.second}", tag = tag)
+
+						if (result.second < 0.79) {
+							if (game.configData.debugMode) game.printToLog("[DEBUG] Confidence of ${result.second} < 0.79, so retrying one more time without thresholding...", tag = tag)
+							val nameSecondTry = game.imageUtils.findTextTesseract(location.x.toInt() - 30, location.y.toInt() - 100, 240, 42, thresh = false)
+							val resultSecondTry = game.tdoll.calculateSimilarity(nameSecondTry)
+							if (game.configData.debugMode) game.printToLog("[DEBUG] Secondary detection of ${resultSecondTry.first}, confidence = ${resultSecondTry.second}")
+							if (resultSecondTry.second >= 0.79) result = resultSecondTry
+						}
+
+						game.printToLog("[SWAP] Initial detection of ${result.first}, confidence = ${result.second}", tag = tag)
+						if (inactiveCorpseDragger == result.first) {
+							game.printToLog("[SWAP] Found the corpse dragger ${result.first} at $location. Swapping ${result.first} and $activeCorpseDragger now...", tag = tag)
+							isDone = true
+							captainLocation = location
+						}
+					}
+				}
+
+				// If found, press it to swap the inactive and active corpse dragger T-Dolls.
+				if (captainLocation != null) {
+					game.gestureUtils.tap(captainLocation!!.x, captainLocation!!.y, "echelon_captain")
+					break
+				} else {
+					tries -= 1
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+						MediaProjectionService.displayWidth.toFloat() / 2, (MediaProjectionService.displayHeight.toFloat() / 2) - 200
+					)
+					game.wait(2.0)
+				}
+			}
+
+			game.goBack()
+			game.goBack()
+			game.printToLog("[SWAP] Successfully swapped corpse draggers.", tag = tag)
+			swapDraggerNow = false
+		}
+	}
+
+	/**
+	 * Finds the location of either of the corpse draggers in the selected echelon.
+	 *
+	 * @return Point object of the corpse dragger location.
+	 */
+	private fun findCorpseDraggerLocation(): Point? {
+		// Select the DPS echelon.
+		selectEchelon(game.configData.dpsEchelons[echelonDeploymentIndex].toInt())
+
+		// Find all instances of the "HP" text for each T-Doll in the echelon.
+		val hpLocations = game.imageUtils.findAll(
+			"echelon_formation_hp", region = intArrayOf(
+				0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth,
+				MediaProjectionService.displayHeight / 2
+			)
+		)
+		if (hpLocations.isEmpty()) throw Exception("Could not find any T-Dolls in Echelon ${echelonDeploymentIndex + 1}.")
+
+		hpLocations.forEach { location ->
+			// Crop out the name text region right above it.
+			val name = game.imageUtils.findTextTesseract(location.x.toInt() - 30, location.y.toInt() - 100, 240, 42)
+			var result = game.tdoll.calculateSimilarity(name)
+			if (game.configData.debugMode) game.printToLog("[DEBUG] Initial detection of ${result.first}, confidence = ${result.second}", tag = tag)
+
+			if (result.second < 0.79) {
+				if (game.configData.debugMode) game.printToLog("[DEBUG] Confidence of ${result.second} < 0.79, so retrying one more time without thresholding...", tag = tag)
+				val nameSecondTry = game.imageUtils.findTextTesseract(location.x.toInt() - 30, location.y.toInt() - 100, 240, 42, thresh = false)
+				val resultSecondTry = game.tdoll.calculateSimilarity(nameSecondTry)
+				if (game.configData.debugMode) game.printToLog("[DEBUG] Secondary detection of ${resultSecondTry.first}, confidence = ${resultSecondTry.second}")
+				if (resultSecondTry.second >= 0.79) result = resultSecondTry
+			}
+
+			game.printToLog("[SWAP] Initial detection of ${result.first}, confidence = ${result.second}", tag = tag)
+			if (game.configData.corpseDragger1 == result.first || game.configData.corpseDragger2 == result.first) {
+				game.printToLog("[SWAP] Found the corpse dragger ${result.first} at $location.", tag = tag)
+
+				// Mark this T-Doll as the active corpse dragger that is present in the DPS echelon.
+				activeCorpseDragger = result.first
+				return location
+			}
+		}
+
+		return null
+	}
+
+	/**
+	 * Select and deploys a echelon on the already selected node. If swapDraggerNow is set, then it will only select the echelon.
+	 *
+	 * @param echelonNumber The echelon to deploy.
+	 * @param deployEchelon If true, deploys the selected echelon onto the currently selected node. Defaults to false.
 	 * @return True if the echelon was deployed.
 	 */
-	private fun deployEchelon(echelonNumber: Int): Boolean {
+	private fun selectEchelon(echelonNumber: Int, deployEchelon: Boolean = false): Boolean {
 		// If the initial check failed, then attempt to find it in the list.
 		var echelonLocation: Point? = game.imageUtils.findImage(
 			"echelon$echelonNumber", tries = 1,
@@ -145,19 +282,20 @@ class Operation(val game: Game) {
 
 					// Now check if the bot has the correct echelon in view.
 					echelonLocation = game.imageUtils.findImage("echelon$echelonNumber", region = intArrayOf(0, 0, MediaProjectionService.displayWidth / 2, MediaProjectionService.displayHeight))
-					if (echelonLocation != null) {
-						break
-					}
+					if (echelonLocation != null) break
 				}
 
 				tempEchelonNumber++
 			}
 		}
 
-		if (echelonLocation != null && game.gestureUtils.tap(echelonLocation.x, echelonLocation.y, "node")) {
-			echelonDeploymentNumber++
-			return game.findAndPress("choose_echelon_ok")
-		} else throw Exception("Failed to deploy echelon $echelonDeploymentNumber in preparation phase.")
+		if (echelonLocation != null && game.gestureUtils.tap(echelonLocation.x, echelonLocation.y, "echelon$echelonNumber")) {
+			return if (deployEchelon) {
+				game.findAndPress("choose_echelon_ok")
+			} else {
+				false
+			}
+		} else throw Exception("Failed to deploy echelon $echelonNumber in preparation phase.")
 	}
 
 	/**
@@ -236,6 +374,7 @@ class Operation(val game: Game) {
 		}
 
 		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
+		swapDraggerNow = true
 		val result = game.findAndPress("end_round")
 		return if (result) {
 			game.wait(10.0)

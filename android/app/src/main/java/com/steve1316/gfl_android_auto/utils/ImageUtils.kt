@@ -813,7 +813,7 @@ class ImageUtils(context: Context, private val game: Game) {
 	 *
 	 * @return The detected String in the cropped region.
 	 */
-	fun findTextTesseract(x: Int, y: Int, width: Int, height: Int): String {
+	fun findTextTesseract(x: Int, y: Int, width: Int, height: Int, thresh: Boolean = true, customThreshold: Double = 130.0, customThreshMaxVal: Double = 255.0): String {
 		val sourceBitmap = MediaProjectionService.takeScreenshotNow(saveImage = true) ?: return ""
 
 		tessBaseAPI.init(myContext.getExternalFilesDir(null)?.absolutePath + "/tesseract/", "eng")
@@ -828,11 +828,15 @@ class ImageUtils(context: Context, private val game: Game) {
 		Imgcodecs.imwrite("$matchFilePath/tesseract_result_${mostRecent}_a.png", cvImage)
 
 		// Thresh the grayscale cropped image to make black and white.
-		val bwImage = Mat()
-		Imgproc.threshold(cvImage, bwImage, 130.0, 255.0, Imgproc.THRESH_BINARY)
-		Imgcodecs.imwrite("$matchFilePath/tesseract_result_${mostRecent}_b.png", bwImage)
+		val resultBitmap = if (thresh) {
+			val bwImage = Mat()
+			Imgproc.threshold(cvImage, bwImage, customThreshold, customThreshMaxVal, Imgproc.THRESH_BINARY)
+			Imgcodecs.imwrite("$matchFilePath/tesseract_result_${mostRecent}_b.png", bwImage)
+			BitmapFactory.decodeFile("$matchFilePath/tesseract_result_${mostRecent}_b.png")
+		} else {
+			BitmapFactory.decodeFile("$matchFilePath/tesseract_result_${mostRecent}_a.png")
+		}
 
-		val resultBitmap = BitmapFactory.decodeFile("$matchFilePath/tesseract_result_${mostRecent}_b.png")
 		tessBaseAPI.setImage(resultBitmap)
 
 		// Set the Page Segmentation Mode to '--psm 7' or "Treat the image as a single text line" according to https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html#page-segmentation-method
@@ -858,13 +862,15 @@ class ImageUtils(context: Context, private val game: Game) {
 		return result
 	}
 
-	/**
-	 * Perform OCR text detection.
-	 *
-	 * @param templateName File name of the template image.
-							game.printToLog("[DEBUG] Detected message: $message", tag = tag)
-						}
+	fun cropEchelonNameRegion(startLocation: Point): Bitmap {
+		val sourceBitmap = MediaProjectionService.takeScreenshotNow()!!
+		val croppedBitmap = Bitmap.createBitmap(sourceBitmap, startLocation.x.toInt() - 15, startLocation.y.toInt() - 90, 235, 45)
+		if (debugMode) {
+			val cvImage = Mat()
+			Utils.bitmapToMat(croppedBitmap, cvImage)
+			Imgcodecs.imwrite("$matchFilePath/croppedEchelonName.png", cvImage)
+		}
 
-						Log.d(tag, "Detected message: $message")
+		return croppedBitmap
 	}
 }
