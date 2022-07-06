@@ -44,7 +44,7 @@ class TDoll(val game: Game) {
 	 * @param testString Detected text from Tesseract
 	 * @return Pair object of the most similar string with its similarity score.
 	 */
-	private fun calculateSimilarity(testString: String): Pair<String, Double> {
+	fun calculateSimilarity(testString: String): Pair<String, Double> {
 		var resultString = ""
 		var resultConfidence = 0.0
 
