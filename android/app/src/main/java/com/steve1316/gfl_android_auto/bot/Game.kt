@@ -182,8 +182,9 @@ class Game(private val myContext: Context) {
 	 *
 	 */
 	fun goBack() {
-		findAndPress("back", tries = 2)
-		waitScreenTransition()
+		if (findAndPress("back", tries = 2)) {
+			waitScreenTransition()
+		}
 	}
 
 	/**
