@@ -16,6 +16,9 @@ export interface Settings {
         enableSetup: boolean
         enableRepair: boolean
         repairInterval: number
+        enableCorpseDrag: boolean
+        corpseDragger1: string
+        corpseDragger2: string
     }
 
     android: {
@@ -44,6 +47,9 @@ export const defaultSettings: Settings = {
         enableSetup: false,
         enableRepair: true,
         repairInterval: 3,
+        enableCorpseDrag: false,
+        corpseDragger1: "",
+        corpseDragger2: "",
     },
     android: {
         enableDelayTap: false,

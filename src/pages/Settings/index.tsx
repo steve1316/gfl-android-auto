@@ -10,7 +10,9 @@ import { Picker } from "@react-native-picker/picker"
 import { Text } from "react-native-elements"
 import NumericInput from "react-native-numeric-input"
 import ReactNativeZoomableView from "@openspacelabs/react-native-zoomable-view/src/ReactNativeZoomableView"
+import DropDownPicker, { ValueType } from "react-native-dropdown-picker"
 import mapJSON from "../../data/maps.json"
+import tdollJSON from "../../data/tdolls.json"
 
 const styles = StyleSheet.create({
     root: {
@@ -19,18 +21,60 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         margin: 10,
     },
+    picker: {
+        marginVertical: 10,
+        backgroundColor: "azure",
+    },
+    dropdown: {
+        marginTop: 20,
+    },
 })
 
 const Settings = () => {
     const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false)
+    const [tdolls, setTdolls] = useState<Item[]>([])
+    const [corpseDragger1, setCorpseDragger1] = useState<ValueType | null>("")
+    const [corpseDragger2, setCorpseDragger2] = useState<ValueType | null>("")
+    const [isOpen1, setIsOpen1] = useState<boolean>(false)
+    const [isOpen2, setIsOpen2] = useState<boolean>(false)
+    const [firstTimeLoad, setFirstTimeLoad] = useState<boolean>(true)
 
     const bsc = useContext(BotStateContext)
+
+    interface Item {
+        label: string
+        value: string
+    }
+
+    useEffect(() => {
+        // Populate the dropdown picker with the list of T-Dolls.
+        let newTDollList: Item[] = []
+        tdollJSON.forEach((tdoll) => {
+            newTDollList = newTDollList.concat({ label: tdoll.name, value: tdoll.name })
+        })
+        let filteredTDollList = Array.from(new Set(newTDollList))
+        setTdolls(filteredTDollList)
+
+        // Set the corpse dragger values from context.
+        setCorpseDragger1(bsc.settings.gfl.corpseDragger1)
+        setCorpseDragger2(bsc.settings.gfl.corpseDragger2)
+        setFirstTimeLoad(false)
+    }, [])
 
     useEffect(() => {
         // Manually set this flag to false as the snackbar autohiding does not set this to false automatically.
         setSnackbarOpen(true)
         setTimeout(() => setSnackbarOpen(false), 1500)
     }, [bsc.readyStatus])
+
+    useEffect(() => {
+        if (!firstTimeLoad) {
+            bsc.setSettings({
+                ...bsc.settings,
+                gfl: { ...bsc.settings.gfl, corpseDragger1: corpseDragger1 !== null ? corpseDragger1.toString() : "", corpseDragger2: corpseDragger2 !== null ? corpseDragger2.toString() : "" },
+            })
+        }
+    }, [firstTimeLoad, corpseDragger1, corpseDragger2])
 
     //////////////////////////////////////////////////
     //////////////////////////////////////////////////
@@ -143,6 +187,64 @@ const Settings = () => {
         )
     }
 
+    const renderCorpseDragSettings = () => {
+        return (
+            <View>
+                <TitleDivider title="Corpse Drag Settings" subtitle="Customize the Corpse Drag settings." hasIcon={true} iconName="account" iconColor="#000" />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.enableCorpseDrag}
+                    onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableCorpseDrag: !bsc.settings.gfl.enableCorpseDrag } })}
+                    text="Enable Corpse Dragging"
+                    subtitle="Check this to enable corpse dragging. If disabled, then bot will keep resupplying the DPS echelons and not swap out the DPS."
+                />
+
+                {bsc.settings.gfl.enableCorpseDrag ? (
+                    <View>
+                        <DropDownPicker
+                            listMode="MODAL"
+                            modalProps={{
+                                animationType: "slide",
+                            }}
+                            style={[styles.picker, { backgroundColor: bsc.settings.gfl.corpseDragger1 !== "" ? "azure" : "pink" }]}
+                            dropDownContainerStyle={styles.dropdown}
+                            placeholder="Select Corpse Dragger #1"
+                            searchTextInputStyle={{ fontStyle: "italic" }}
+                            searchable={true}
+                            items={tdolls}
+                            open={isOpen1}
+                            setOpen={(flag) => {
+                                setIsOpen1(flag)
+                            }}
+                            value={corpseDragger1}
+                            setValue={setCorpseDragger1}
+                            zIndex={9999}
+                        />
+                        <DropDownPicker
+                            listMode="MODAL"
+                            modalProps={{
+                                animationType: "slide",
+                            }}
+                            style={[styles.picker, { backgroundColor: bsc.settings.gfl.corpseDragger2 !== "" ? "azure" : "pink" }]}
+                            dropDownContainerStyle={styles.dropdown}
+                            placeholder="Select Corpse Dragger #2"
+                            searchTextInputStyle={{ fontStyle: "italic" }}
+                            searchable={true}
+                            items={tdolls}
+                            open={isOpen2}
+                            setOpen={(flag) => {
+                                setIsOpen2(flag)
+                            }}
+                            value={corpseDragger2}
+                            setValue={setCorpseDragger2}
+                            zIndex={9999}
+                        />
+                    </View>
+                ) : null}
+            </View>
+        )
+    }
+
     const renderDiscordSettings = () => {
         return (
             <View>
@@ -251,6 +353,8 @@ const Settings = () => {
                 {renderMapSettings()}
 
                 {renderEchelonSettings()}
+
+                {renderCorpseDragSettings()}
 
                 {renderRepairSettings()}
 
