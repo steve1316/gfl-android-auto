@@ -63,6 +63,9 @@ class JSONParser {
 				putBoolean("enableSetup", gflObj.getBoolean("enableSetup"))
 				putBoolean("enableRepair", gflObj.getBoolean("enableRepair"))
 				putInt("repairInterval", gflObj.getInt("repairInterval"))
+				putBoolean("enableCorpseDrag", gflObj.getBoolean("enableCorpseDrag"))
+				putString("corpseDragger1", gflObj.getString("corpseDragger1"))
+				putString("corpseDragger2", gflObj.getString("corpseDragger2"))
 				commit()
 			}
 

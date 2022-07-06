@@ -28,6 +28,9 @@ class ConfigData(myContext: Context) {
 	val enableSetup: Boolean
 	val enableRepair: Boolean
 	val repairInterval: Int
+	val enableCorpseDrag: Boolean
+	val corpseDragger1: String
+	val corpseDragger2: String
 
 	// Discord
 	val enableDiscordNotifications: Boolean
@@ -56,6 +59,9 @@ class ConfigData(myContext: Context) {
 		enableSetup = sharedPreferences.getBoolean("enableSetup", false)
 		enableRepair = sharedPreferences.getBoolean("enableRepair", true)
 		repairInterval = sharedPreferences.getInt("amount", 3)
+		enableCorpseDrag = sharedPreferences.getBoolean("enableCorpseDrag", false)
+		corpseDragger1 = sharedPreferences.getString("corpseDragger1", "")!!
+		corpseDragger2 = sharedPreferences.getString("corpseDragger2", "")!!
 
 		// Token and user ID for use with the Discord API.
 		enableDiscordNotifications = sharedPreferences.getBoolean("enableDiscordNotifications", false)
