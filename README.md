@@ -25,7 +25,7 @@ This application is developed with educational purposes in mind while exploring 
     -   [ ] 0-4
     -   [ ] 11-5
 -   [x] Use specified Dummy and DPS Echelons.
-    -   [ ] Swaps out DPS between Echelons for Corpse Dragging.
+    -   [x] Swaps out DPS between Echelons for Corpse Dragging.
 -   [x] ~~Enhance~~/Dismantle excess T-Dolls.
 -   [x] Detect what T-Doll dropped as a reward during combat/operation end via Tesseract OCR.
 -   [ ] Optional Discord integration for status and T-Doll alerts.
