@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
-import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.googlecode.tesseract.android.TessBaseAPI
@@ -707,12 +706,12 @@ class ImageUtils(context: Context, private val game: Game) {
 	 * @param customConfidence Accuracy threshold for matching. Defaults to 0.0 which will use the confidence set in the app's settings.
 	 * @return An ArrayList of Point objects containing all the occurrences of the specified image or null if not found.
 	 */
-	fun findAll(templateName: String, folderName: String, region: IntArray = intArrayOf(0, 0, 0, 0), customConfidence: Double = 0.0): ArrayList<Point> {
+	fun findAll(templateName: String, region: IntArray = intArrayOf(0, 0, 0, 0), customConfidence: Double = 0.0): ArrayList<Point> {
 		if (debugMode) {
 			game.printToLog("\n[DEBUG] Starting process to find all ${templateName.uppercase()} images...", tag = tag)
 		}
 
-		val (sourceBitmap, templateBitmap) = getBitmaps(templateName, folderName)
+		val (sourceBitmap, templateBitmap) = getBitmaps(templateName, "images")
 
 		// Clear the ArrayList first before attempting to find all matches.
 		matchLocations.clear()
@@ -863,43 +862,9 @@ class ImageUtils(context: Context, private val game: Game) {
 	 * Perform OCR text detection.
 	 *
 	 * @param templateName File name of the template image.
-	 * @param folderName Name of the folder that the template image is in.
-	 * @return ArrayList of detected text.
-	 */
-	fun findTextGoogleMLKit(templateName: String, folderName: String): ArrayList<String> {
-		// Read up on Google's ML Kit at https://developers.google.com/ml-kit/vision/text-recognition/android and my usage of it at
-		// https://github.com/steve1316/granblue-automation-android/blob/08ea2236f5508df1204992cb58e865b5dfd4620e/app/src/main/java/com/steve1316/granblueautomation_android/utils/ImageUtils.kt#L668-L688
-		// for a better understanding of how to do OCR detection.
-
-		val result = arrayListOf<String>()
-		val (_, templateBitMap) = getBitmaps(templateName, folderName)
-
-		if (templateBitMap != null) {
-			// Create a InputImage object for Google's ML OCR.
-			val inputImage = InputImage.fromBitmap(templateBitMap, 0)
-
-			// Start the asynchronous operation of text detection.
-			textRecognizer.process(inputImage).addOnSuccessListener {
-				if (it.textBlocks.size != 0) {
-					for (block in it.textBlocks) {
-						val message: String = block.text
-						result.add(message)
-
-						if (debugMode) {
 							game.printToLog("[DEBUG] Detected message: $message", tag = tag)
 						}
 
 						Log.d(tag, "Detected message: $message")
-					}
-				}
-			}.addOnFailureListener {
-				game.printToLog("[ERROR] Failed to do text detection on bitmap.", tag = tag, isError = true)
-			}
-		}
-
-		// Wait a few seconds for the asynchronous operations of Google's OCR to finish.
-		game.wait(3.0)
-
-		return result
 	}
 }

@@ -274,7 +274,7 @@ class Game(private val myContext: Context) {
 			nav.enterMap(configData.mapName, skipInitialLocationCheck = skipLocationCheck)
 			if (imageUtils.findImage("insufficient_slots", tries = 2) != null) {
 				// Handle the case where there are too many T-Dolls in the inventory.
-				val moveToLocations = imageUtils.findAll("dismantle_move_to", "images")
+				val moveToLocations = imageUtils.findAll("dismantle_move_to")
 				gestureUtils.tap(moveToLocations[1].x, moveToLocations[1].y, "dismantle_move_to")
 				waitScreenTransition()
 				factory.disassemble()
