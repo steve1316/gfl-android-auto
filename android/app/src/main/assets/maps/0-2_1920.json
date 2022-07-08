@@ -23,14 +23,18 @@
     },
     "moves": {
         "1": {
+            "action": "resupply",
+            "coordinates": [590, 775]
+        },
+        "2": {
             "action": "start",
             "coordinates": [975, 775]
         },
-        "2": {
+        "3": {
             "action": "move",
             "coordinates": [985, 275]
         },
-        "3": {
+        "4": {
             "action": "move",
             "coordinates": [1300, 225]
         }
