@@ -142,6 +142,10 @@ const Settings = () => {
                     </View>
                 ) : null}
 
+                <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+                <Text style={{ marginBottom: 10, fontSize: 12, opacity: 0.7, color: "black" }}>The numbers signify what echelon number to deploy.</Text>
+                <Divider />
+
                 <View style={{ marginTop: 10, borderWidth: 1 }}>
                     <Text style={{ color: "#000", marginLeft: 5 }}>Dummy 1</Text>
                     <Picker
@@ -201,6 +205,12 @@ const Settings = () => {
 
                 {bsc.settings.gfl.enableCorpseDrag ? (
                     <View>
+                        <Divider style={{ marginBottom: 10 }} />
+                        <Text style={{ marginBottom: 10, fontSize: 12, opacity: 0.7, color: "black" }}>
+                            The order of corpse draggers does not matter whether it is #1 or #2. The bot will take care of it.
+                        </Text>
+                        <Divider />
+
                         <DropDownPicker
                             listMode="MODAL"
                             modalProps={{
@@ -220,6 +230,14 @@ const Settings = () => {
                             setValue={setCorpseDragger1}
                             zIndex={9999}
                         />
+
+                        <CustomCheckbox
+                            isChecked={bsc.settings.gfl.enableCorpseDragger1Mod}
+                            onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableCorpseDragger1Mod: !bsc.settings.gfl.enableCorpseDragger1Mod } })}
+                            text="Corpse Dragger #1 is MOD"
+                            subtitle="Check this to indicate that this corpse dragger has their Digimind Upgrade."
+                        />
+
                         <DropDownPicker
                             listMode="MODAL"
                             modalProps={{
@@ -238,6 +256,13 @@ const Settings = () => {
                             value={corpseDragger2}
                             setValue={setCorpseDragger2}
                             zIndex={9999}
+                        />
+
+                        <CustomCheckbox
+                            isChecked={bsc.settings.gfl.enableCorpseDragger2Mod}
+                            onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableCorpseDragger2Mod: !bsc.settings.gfl.enableCorpseDragger2Mod } })}
+                            text="Corpse Dragger #2 is MOD"
+                            subtitle="Check this to indicate that this corpse dragger has their Digimind Upgrade."
                         />
                     </View>
                 ) : null}

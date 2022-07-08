@@ -19,6 +19,8 @@ export interface Settings {
         enableCorpseDrag: boolean
         corpseDragger1: string
         corpseDragger2: string
+        enableCorpseDragger1Mod: boolean
+        enableCorpseDragger2Mod: boolean
     }
 
     android: {
