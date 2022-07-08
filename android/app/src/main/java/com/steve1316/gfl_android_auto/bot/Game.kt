@@ -232,6 +232,24 @@ class Game(private val myContext: Context) {
 	}
 
 	/**
+	 * Checks if a logistic needs to be restarted.
+	 *
+	 * @return True if a logistic was taken care of.
+	 */
+	fun checkLogistics(): Boolean {
+		return if (imageUtils.findImage("logistics", tries = 5) != null) {
+			gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+			findAndPress("logistics_ok")
+			wait(1.0)
+			true
+		} else {
+			false
+		}
+	}
+
+
+
+	/**
 	 * Bot will begin automation here.
 	 *
 	 * @return True if all automation goals have been met. False otherwise.
@@ -259,6 +277,11 @@ class Game(private val myContext: Context) {
 		// Start the logic loop here.
 		var failureTries = 5
 		while (runsCompleted < configData.amount) {
+			// Clear out all pending logistics.
+			while (checkLogistics()) {
+				wait(1.0)
+			}
+
 			// Navigate to the map.
 			// TODO: Cover all instances where the bot might be anywhere in the app. It must get to the home screen first before continuing.
 			val skipLocationCheck = checkCombatScreen()
