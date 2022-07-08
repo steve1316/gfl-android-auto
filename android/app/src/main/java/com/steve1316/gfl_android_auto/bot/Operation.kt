@@ -14,7 +14,7 @@ class Operation(val game: Game) {
 	private var echelonDeploymentIndex: Int = 0
 	private var inactiveCorpseDragger: String = ""
 	private var activeCorpseDragger: String = ""
-	private var swapDraggerNow: Boolean = true
+	private var isMod: Boolean = false
 
 	/**
 	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
@@ -123,9 +123,11 @@ class Operation(val game: Game) {
 			// Mark the other corpse dragger as the inactive one.
 			if (game.configData.corpseDragger1 == activeCorpseDragger) {
 				inactiveCorpseDragger = game.configData.corpseDragger2
+				isMod = game.configData.enableCorpseDragger2Mod
 				activeCorpseDragger = game.configData.corpseDragger1
 			} else {
 				inactiveCorpseDragger = game.configData.corpseDragger1
+				isMod = game.configData.enableCorpseDragger1Mod
 				activeCorpseDragger = game.configData.corpseDragger2
 			}
 
@@ -135,8 +137,14 @@ class Operation(val game: Game) {
 				it.name == inactiveCorpseDragger
 			}
 
-			// Filter by the type of the inactive corpse dragger.
+			// Filter by the type and rarity of the inactive corpse dragger.
 			game.findAndPress("echelon_${corpseDraggerData?.type?.lowercase()}")
+			val newRarity: Int = if (isMod) {
+				corpseDraggerData!!.rarity + 1
+			} else {
+				corpseDraggerData!!.rarity
+			}
+			game.findAndPress("echelon_${newRarity}_star")
 			game.findAndPress("echelon_formation_filter_by_confirm")
 
 			// Now find all locations of Captains and perform OCR to determine the location of the Captain of the echelon to swap with.

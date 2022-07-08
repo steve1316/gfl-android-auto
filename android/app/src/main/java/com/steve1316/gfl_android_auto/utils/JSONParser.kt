@@ -66,6 +66,8 @@ class JSONParser {
 				putBoolean("enableCorpseDrag", gflObj.getBoolean("enableCorpseDrag"))
 				putString("corpseDragger1", gflObj.getString("corpseDragger1"))
 				putString("corpseDragger2", gflObj.getString("corpseDragger2"))
+				putBoolean("enableCorpseDragger1Mod", gflObj.getBoolean("enableCorpseDragger1Mod"))
+				putBoolean("enableCorpseDragger2Mod", gflObj.getBoolean("enableCorpseDragger2Mod"))
 				commit()
 			}
 

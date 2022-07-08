@@ -31,6 +31,8 @@ class ConfigData(myContext: Context) {
 	val enableCorpseDrag: Boolean
 	val corpseDragger1: String
 	val corpseDragger2: String
+	val enableCorpseDragger1Mod: Boolean
+	val enableCorpseDragger2Mod: Boolean
 
 	// Discord
 	val enableDiscordNotifications: Boolean
@@ -62,6 +64,8 @@ class ConfigData(myContext: Context) {
 		enableCorpseDrag = sharedPreferences.getBoolean("enableCorpseDrag", false)
 		corpseDragger1 = sharedPreferences.getString("corpseDragger1", "")!!
 		corpseDragger2 = sharedPreferences.getString("corpseDragger2", "")!!
+		enableCorpseDragger1Mod = sharedPreferences.getBoolean("enableCorpseDragger1Mod", false)
+		enableCorpseDragger2Mod = sharedPreferences.getBoolean("enableCorpseDragger2Mod", false)
 
 		// Token and user ID for use with the Discord API.
 		enableDiscordNotifications = sharedPreferences.getBoolean("enableDiscordNotifications", false)
