@@ -27,7 +27,15 @@ class TDoll(val game: Game) {
 				result = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90)
 			}
 
-			val similarityObj = calculateSimilarity(result)
+			var similarityObj = calculateSimilarity(result)
+
+			if (similarityObj.second < 0.79) {
+				if (game.configData.debugMode) game.printToLog("[DEBUG] Confidence of ${similarityObj.second} < 0.79, so retrying one more time without thresholding...", tag = tag)
+				val nameSecondTry = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90, thresh = false)
+				val resultSecondTry = game.tdoll.calculateSimilarity(nameSecondTry)
+				if (game.configData.debugMode) game.printToLog("[DEBUG] Secondary detection of ${resultSecondTry.first}, confidence = ${resultSecondTry.second}")
+				if (resultSecondTry.second >= 0.79) similarityObj = resultSecondTry
+			}
 
 			game.printToLog("[DETECTION] Detected text: $result most similar to ${similarityObj.first} with a score of ${similarityObj.second}\n", tag = tag)
 
