@@ -208,7 +208,7 @@ class Game(private val myContext: Context) {
 	 *
 	 * @return True if the bot repaired echelons.
 	 */
-	fun repair(): Boolean {
+	private fun repair(): Boolean {
 		if (configData.enableRepair && configData.repairInterval != 0 && runsCompleted % configData.repairInterval == 0) {
 			printToLog("\n[Repair] Starting process to repair echelons...")
 			val result: Boolean = if (findAndPress("repair", tries = 2)) {
