@@ -9,14 +9,42 @@ import org.opencv.core.Point
 class Navigation(val game: Game) {
 	private val tag = "[Navigation]"
 
+	// TODO: rename enterMap and separate out logic for selecting the mission.
+
 	/**
 	 * Starts the process to verify and/or enter the correct map.
 	 *
 	 * @param mapName Name of the map to run.
 	 * @param skipInitialLocationCheck Skip the initial check for the Combat button on the Home screen. Defaults to false.
+	 * @param retreated Skips the entire navigation process if the bot previously retreated and terminated a run. Defaults to false.
 	 * @return True if the bot was able to enter the specified map.
 	 */
-	fun enterMap(mapName: String, skipInitialLocationCheck: Boolean = false): Boolean {
+	fun enterMap(mapName: String, skipInitialLocationCheck: Boolean = false, retreated: Boolean = false): Boolean {
+		if (retreated) {
+			// Now that the correct episode is now active, select the map.
+			if (!game.findAndPress("map$mapName")) {
+				game.printToLog("\n[Navigation] Map $mapName was not found. Scrolling list of available maps...", tag = tag)
+				var tries = 3
+				while (tries > 0) {
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2, MediaProjectionService.displayWidth.toFloat() / 2,
+						(MediaProjectionService.displayHeight.toFloat() / 2) - 400
+					)
+
+					// Wait for the scrolling animation to settle.
+					game.wait(2.0)
+
+					if (game.findAndPress("map$mapName")) {
+						break
+					}
+
+					tries -= 1
+				}
+			}
+
+			return game.findAndPress("normal_battle")
+		}
+
 		// Enter the Combat screen.
 		game.printToLog("\n[Navigation] Entering the Combat screen now...", tag = tag)
 		if (!skipInitialLocationCheck && !game.findAndPress("home_combat", tries = 30)) throw Exception("Failed to enter Combat screen from the Home screen.")
@@ -25,6 +53,9 @@ class Navigation(val game: Game) {
 		// Determine the correct chapter.
 		val episodeString = when (mapName) {
 			"0-2" -> {
+				"00"
+			}
+			"0-4" -> {
 				"00"
 			}
 			////////////////// TODO: Implement the rest of the maps.

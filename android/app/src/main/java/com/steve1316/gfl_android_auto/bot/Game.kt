@@ -200,7 +200,7 @@ class Game(private val myContext: Context) {
 	 *
 	 */
 	fun checkCombatScreen(): Boolean {
-		return imageUtils.findImage("combat_screen", tries = 2) != null
+		return op.retreated || imageUtils.findImage("combat_screen", tries = 2) != null
 	}
 
 	/**
@@ -295,7 +295,7 @@ class Game(private val myContext: Context) {
 				repair()
 			}
 
-			nav.enterMap(configData.mapName, skipInitialLocationCheck = skipLocationCheck)
+			nav.enterMap(configData.mapName, skipInitialLocationCheck = skipLocationCheck, retreated = op.retreated)
 			if (imageUtils.findImage("insufficient_slots", tries = 2) != null) {
 				// Handle the case where there are too many T-Dolls in the inventory.
 				val moveToLocations = imageUtils.findAll("dismantle_move_to")
@@ -303,6 +303,7 @@ class Game(private val myContext: Context) {
 				waitScreenTransition()
 				factory.disassemble()
 				goBack()
+				op.retreated = false
 				continue
 			}
 
@@ -317,9 +318,9 @@ class Game(private val myContext: Context) {
 			// Finally, execute Planning Mode.
 			if (op.executeOperation()) {
 				// Check if the operation ended in success or failure.
-				if (imageUtils.findImage("result_settlement", tries = 10) != null) {
+				if (!op.retreated && imageUtils.findImage("result_settlement", tries = 10) != null) {
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
-					wait(3.0)
+					wait(4.0)
 
 					// Start detection of acquired T-Doll.
 					printToLog("[INFO] Analyzing the final T-Doll reward...")
@@ -328,10 +329,19 @@ class Game(private val myContext: Context) {
 					// Now close out the screens.
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 					wait(1.0)
-					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
-					wait(1.0)
-					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
-					wait(5.0)
+
+					// Swap out the corpse draggers if it is enabled.
+					if (configData.enableCorpseDrag && op.swapDraggerNow) {
+						printToLog("[INFO] Now swapping corpse draggers from the home screen...")
+						findAndPress("return_to_base")
+						waitScreenTransition()
+						op.beginCorpseDraggerSwap()
+					} else {
+						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+						wait(1.0)
+						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+						wait(5.0)
+					}
 				} else {
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 				}

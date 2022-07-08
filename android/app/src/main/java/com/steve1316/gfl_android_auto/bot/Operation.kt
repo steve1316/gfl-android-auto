@@ -10,11 +10,16 @@ import org.opencv.core.Point
  */
 class Operation(val game: Game) {
 	private val tag = "[Operation]"
+	private var firstTime: Boolean = true
 	private var dummyDeploymentIndex: Int = 0
 	private var echelonDeploymentIndex: Int = 0
 	private var inactiveCorpseDragger: String = ""
 	private var activeCorpseDragger: String = ""
 	private var isMod: Boolean = false
+	private var mustRetreat: Boolean = false
+	var retreated: Boolean = false
+	private var retreatLocation: Point = Point()
+	var swapDraggerNow: Boolean = false
 
 	/**
 	 * Prepare for the combat operation by zooming in/out the map as needed and deploying echelons.
@@ -68,6 +73,16 @@ class Operation(val game: Game) {
 				}
 				"deploy_dummy" -> {
 					if (!game.configData.enableSetup) {
+						if (swapDraggerNow) {
+							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+
+							// Head to the Formation screen.
+							game.findAndPress("echelon_formation")
+
+							swapCorpseDragger()
+							resetZoom()
+						}
+
 						game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
@@ -76,10 +91,20 @@ class Operation(val game: Game) {
 				}
 				"deploy_echelon" -> {
 					if (!game.configData.enableSetup) {
+						if (swapDraggerNow) {
+							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+
+							// Head to the Formation screen.
+							game.findAndPress("echelon_formation")
+
+							swapCorpseDragger()
+							resetZoom()
+						}
+
 						game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]})", tag = tag)
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
-						if (selectEchelon(game.configData.dummyEchelons[echelonDeploymentIndex].toInt(), deployEchelon = true)) echelonDeploymentIndex++
+						if (selectEchelon(game.configData.dpsEchelons[echelonDeploymentIndex].toInt(), deployEchelon = true)) echelonDeploymentIndex++
 					}
 				}
 				else -> {
@@ -98,13 +123,56 @@ class Operation(val game: Game) {
 		}
 	}
 
+	private fun resetZoom() {
+		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
+		game.printToLog("[RESET] Resetting the map zoom now...", tag = tag)
+		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
+		game.wait(2.0)
+		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
+		game.wait(2.0)
+
+		SetupData.setupSteps.forEach { init ->
+			if (game.configData.debugMode) game.printToLog("[DEBUG] Setup executing: $init", tag = tag)
+			when (init.action) {
+				"pinch_in" -> {
+					game.printToLog("[RESET] Zooming in the map now...", tag = tag)
+					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+					game.wait(2.0)
+				}
+				"pinch_out" -> {
+					game.printToLog("[RESET] Zooming out the map now...", tag = tag)
+					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+					game.wait(2.0)
+				}
+				"swipe_up" -> {
+					game.printToLog("[RESET] Swiping the map up now...", tag = tag)
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+						MediaProjectionService.displayWidth.toFloat() / 2,
+						(MediaProjectionService.displayHeight.toFloat() / 2) + init.spacing[0].toFloat()
+					)
+					game.wait(2.0)
+				}
+				"swipe_down" -> {
+					game.printToLog("[RESET] Swiping the map down now...", tag = tag)
+					game.gestureUtils.swipe(
+						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+						MediaProjectionService.displayWidth.toFloat() / 2,
+						(MediaProjectionService.displayHeight.toFloat() / 2) - init.spacing[0].toFloat()
+					)
+					game.wait(2.0)
+				}
+			}
+		}
+	}
+
 	/**
-	 * Swap the corpse dragger T-Doll between the DPS and dummy echelons.
+	 * Swap the corpse dragger T-Doll between the DPS and dummy echelons during the Deployment Phase.
 	 *
 	 */
-	fun swapCorpseDragger() {
+	private fun swapCorpseDragger() {
 		// Enter the Formation screen.
-		if (game.configData.enableCorpseDrag && swapDraggerNow && game.findAndPress("echelon_formation")) {
+		if (game.configData.enableCorpseDrag && swapDraggerNow) {
 			game.waitScreenTransition()
 
 			game.printToLog("\n[SWAP] Swapping dragger between Dummy and DPS echelons now...", tag = tag)
@@ -316,35 +384,60 @@ class Operation(val game: Game) {
 		game.printToLog("\n= = = = = = = = = = = = = = = =", tag = tag)
 		game.printToLog("[SETUP_PLANNING_MODE] Laying out the moves for Planning Mode now...", tag = tag)
 
-		if (game.imageUtils.findImage("planning_mode") == null) throw Exception("Failed to find Planning Mode.")
+		if (game.imageUtils.findImage("planning_mode", tries = 30) == null) throw Exception("Failed to find Planning Mode.")
 
 		PlanningModeData.moves.forEach { move ->
 			if (game.configData.debugMode) game.printToLog("[DEBUG] Move executing: $move", tag = tag)
 			when (move.action) {
+				"resupply" -> {
+					// Resupply dummy echelon.
+					resupply(move)
+				}
 				"start" -> {
-					// Resupply DPS echelon.
-					game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-					game.wait(0.5)
-					game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-					game.findAndPress("resupply")
+					// Resupply the DPS echelon if corpse dragging is disabled.
+					if (firstTime || !game.configData.enableCorpseDrag) resupply(move)
+					firstTime = false
 
 					// Activate Planning Mode.
-					if (!game.findAndPress("planning_mode")) throw Exception("Unable to proceed with Planning Mode as the button was not found or was obscured by something else.")
+					if (!game.findAndPress("planning_mode", tries = 30)) throw Exception("Unable to proceed with Planning Mode as the button was not found or was obscured by something else.")
 					game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-				}
-				"start_no_resupply" -> {
-					// Activate Planning Mode.
-					if (!game.findAndPress("planning_mode")) throw Exception("Unable to proceed with Planning Mode as the button was not found or was obscured by something else.")
-					game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+					game.findAndPress("planning_mode_select", tries = 2)
 				}
 				"move" -> {
 					game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+				}
+				"retreat" -> {
+					mustRetreat = true
+					retreatLocation = Point(move.coordinates[0].toDouble(), move.coordinates[1].toDouble())
 				}
 			}
 		}
 
 		game.printToLog("\n[SETUP_PLANNING_MODE] Finished preparation for operation.", tag = tag)
 		game.printToLog("= = = = = = = = = = = = = = = =", tag = tag)
+	}
+
+	private fun resupply(move: PlanningModeData.Companion.Moves) {
+		game.printToLog("\n[RESUPPLY] Resupplying echelon at ${move.coordinates} now...", tag = tag)
+		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+		game.wait(0.5)
+		if (game.imageUtils.findImage("resupply", tries = 1) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
+			var tries = 3
+			while (tries > 0) {
+				game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+				game.wait(0.5)
+				if (game.imageUtils.findImage("resupply", tries = 3) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
+					tries -= 1
+				} else {
+					break
+				}
+			}
+			if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
+		}
+		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+		game.wait(0.5)
+		game.findAndPress("resupply")
+		game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
 	}
 
 	/**
@@ -360,35 +453,85 @@ class Operation(val game: Game) {
 		var tries = 3
 		while (tries > 0) {
 			// If the End Round button vanished, then the bot might be in combat so wait for it to end before retrying checks.
-			if (game.imageUtils.waitVanish(
+			if (game.imageUtils.findImage(
 					"end_round", region =
-					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), timeout = 2, suppressError = true
-				)
+					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), tries = 2, suppressError = true
+				) == null
 			) {
+				if (game.imageUtils.findImage("echelon_warning", tries = 1, suppressError = true) != null) {
+					throw Exception ("Echelon ran out of ammo/rations. Stopping the bot to avoid any further complications.")
+				}
+
 				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting for combat end before retrying checks...", tag = tag)
 				tries = 3
 
 				// Wait until combat ends.
 				while (!game.imageUtils.waitVanish("combat_pause", timeout = 1, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))) {
-					game.wait(0.5)
+					game.wait(1.0)
 				}
 
+				game.wait(5.0)
 				game.tdoll.startDetection()
 				game.wait(5.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
 				tries -= 1
+				game.wait(1.0)
 			}
+		}
+
+		if (mustRetreat) {
+			resetZoom()
+
+			game.wait(0.5)
+			game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
+			game.wait(0.5)
+			game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
+
+			// Retreat this echelon.
+			game.findAndPress("retreat")
+			game.findAndPress("retreat_ok")
+
+			// Now terminate the mission.
+			game.findAndPress("terminate_mission")
+			game.findAndPress("terminate_mission_confirm")
+			swapDraggerNow = true
+			mustRetreat = false
+			retreated = true
+			retreatLocation = Point()
+			echelonDeploymentIndex = 0
+			dummyDeploymentIndex = 0
+			return true
 		}
 
 		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
 		swapDraggerNow = true
-		val result = game.findAndPress("end_round")
+		echelonDeploymentIndex = 0
+		dummyDeploymentIndex = 0
+		val result = game.findAndPress("end_round", tries = 30)
 		return if (result) {
 			game.wait(10.0)
 			result
 		} else {
 			result
+		}
+	}
+
+	/**
+	 * Starts the process of swapping out corpse draggers from the home screen.
+	 *
+	 */
+	fun beginCorpseDraggerSwap() {
+		if (game.configData.enableCorpseDrag) {
+			// Clear out all pending logistics.
+			while (game.checkLogistics()) {
+				game.wait(1.0)
+			}
+
+			// Head to the Formation screen.
+			game.findAndPress("formation")
+			game.waitScreenTransition()
+			swapCorpseDragger()
 		}
 	}
 }
