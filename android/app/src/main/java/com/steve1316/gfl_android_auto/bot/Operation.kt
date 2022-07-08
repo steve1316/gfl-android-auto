@@ -455,7 +455,7 @@ class Operation(val game: Game) {
 			// If the End Round button vanished, then the bot might be in combat so wait for it to end before retrying checks.
 			if (game.imageUtils.findImage(
 					"end_round", region =
-					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), tries = 2, suppressError = true
+					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), tries = 3, suppressError = true
 				) == null
 			) {
 				if (game.imageUtils.findImage("echelon_warning", tries = 1, suppressError = true) != null) {
@@ -472,7 +472,7 @@ class Operation(val game: Game) {
 
 				game.wait(5.0)
 				game.tdoll.startDetection()
-				game.wait(5.0)
+				game.wait(8.0)
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
 				tries -= 1

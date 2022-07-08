@@ -17,7 +17,7 @@ class TDoll(val game: Game) {
 	 * @return String from Tesseract or empty string in the case of ImageUtils being unable to get a screenshot.
 	 */
 	fun startDetection(): String {
-		val shareLocation = game.imageUtils.findImage("tdoll_share", tries = 5, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))
+		val shareLocation = game.imageUtils.findImage("tdoll_share", tries = 10, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))
 		return if (shareLocation != null) {
 			game.printToLog("\n[DETECTION] T-Doll is on screen. Now attempting to determine name of T-Doll...", tag = tag)
 			var result = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90)
