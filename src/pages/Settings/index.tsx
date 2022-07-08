@@ -7,7 +7,7 @@ import CustomCheckbox from "../../components/CustomCheckbox"
 import { TextInput } from "react-native-paper"
 import TitleDivider from "../../components/TitleDivider"
 import { Picker } from "@react-native-picker/picker"
-import { Text } from "react-native-elements"
+import { Divider, Text } from "react-native-elements"
 import NumericInput from "react-native-numeric-input"
 import ReactNativeZoomableView from "@openspacelabs/react-native-zoomable-view/src/ReactNativeZoomableView"
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker"
@@ -40,6 +40,12 @@ const Settings = () => {
     const [firstTimeLoad, setFirstTimeLoad] = useState<boolean>(true)
 
     const bsc = useContext(BotStateContext)
+
+    // TODO: Update this list each time a new map is supported for this app and is reflected both in the maps.json file and its associated map image file.
+    const maps = {
+        "0-2": require("../../images/0-2.webp"),
+        "0-4": require("../../images/0-4.webp"),
+    }
 
     interface Item {
         label: string
@@ -119,11 +125,6 @@ const Settings = () => {
     }
 
     const renderEchelonSettings = () => {
-        // Update this list each time a new map is supported for this app and is reflected both in the maps.json file and its associated map image file.
-        const maps = {
-            "0-2": require("../../images/0-2.webp"),
-        }
-
         return (
             <View>
                 <TitleDivider
