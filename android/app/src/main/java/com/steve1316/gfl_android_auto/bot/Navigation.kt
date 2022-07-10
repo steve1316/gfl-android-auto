@@ -58,6 +58,12 @@ class Navigation(val game: Game) {
 			"0-4" -> {
 				"00"
 			}
+			"2-3" -> {
+				"02"
+			}
+			"5-2e" -> {
+				"05"
+			}
 			////////////////// TODO: Implement the rest of the maps.
 			else -> {
 				""
