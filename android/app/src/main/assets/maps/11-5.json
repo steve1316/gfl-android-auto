@@ -6,44 +6,49 @@
             "coordinates": []
         },
         "2": {
-            "action": "deploy_dummy",
-            "spacing": [1350, 605],
+            "action": "pinch_out",
+            "spacing": [1000, 100],
             "coordinates": []
         },
         "3": {
+            "action": "deploy_dummy",
+            "spacing": [],
+            "coordinates": [1200, 670]
+        },
+        "4": {
             "action": "deploy_echelon",
             "spacing": [],
-            "coordinates": [1205, 605]
+            "coordinates": [1080, 670]
         }
     },
     "moves": {
         "1": {
             "action": "resupply",
-            "coordinates": [1350, 605]
+            "coordinates": [1200, 670]
         },
         "2": {
             "action": "start",
-            "coordinates": [1205, 605]
+            "coordinates": [1080, 670]
         },
         "3": {
             "action": "move",
-            "coordinates": [1060, 605]
+            "coordinates": [955, 670]
         },
         "4": {
             "action": "move",
-            "coordinates": [1060, 495]
+            "coordinates": [955, 575]
         },
         "5": {
             "action": "move",
-            "coordinates": [1205, 500]
+            "coordinates": [1080, 575]
         },
         "6": {
             "action": "move",
-            "coordinates": [1205, 365]
+            "coordinates": [1080, 460]
         },
         "7": {
             "action": "move",
-            "coordinates": [1350, 365]
+            "coordinates": [1200, 460]
         }
     }
 }
