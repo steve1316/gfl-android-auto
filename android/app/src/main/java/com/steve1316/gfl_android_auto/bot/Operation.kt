@@ -10,6 +10,7 @@ import org.opencv.core.Point
  */
 class Operation(val game: Game) {
 	private val tag = "[Operation]"
+
 	private var firstTime: Boolean = true
 	private var dummyDeploymentIndex: Int = 0
 	private var echelonDeploymentIndex: Int = 0
@@ -74,6 +75,7 @@ class Operation(val game: Game) {
 				"deploy_dummy" -> {
 					if (!game.configData.enableSetup) {
 						if (swapDraggerNow) {
+							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (1)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 
 							// Head to the Formation screen.
@@ -92,6 +94,7 @@ class Operation(val game: Game) {
 				"deploy_echelon" -> {
 					if (!game.configData.enableSetup) {
 						if (swapDraggerNow) {
+							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (2)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 
 							// Head to the Formation screen.
@@ -123,6 +126,10 @@ class Operation(val game: Game) {
 		}
 	}
 
+	/**
+	 * Resets the zoom on the map to after Planning Mode levels of zoom.
+	 *
+	 */
 	private fun resetZoom() {
 		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
 		game.printToLog("[RESET] Resetting the map zoom now...", tag = tag)
@@ -179,8 +186,10 @@ class Operation(val game: Game) {
 
 			val corpseDraggerLocation = findCorpseDraggerLocation()
 			if (corpseDraggerLocation == null) {
-				game.printToLog("[SWAP] Could not find the position of the corpse dragger ${game.configData.corpseDragger1} or ${game.configData.corpseDragger2}. " +
-						"Skipping corpse dragging...", tag = tag)
+				game.printToLog(
+					"[SWAP] Could not find the position of the corpse dragger ${game.configData.corpseDragger1} or ${game.configData.corpseDragger2}. " +
+							"Skipping corpse dragging...", tag = tag
+				)
 				return
 			}
 
@@ -200,6 +209,7 @@ class Operation(val game: Game) {
 			}
 
 			// Open the Filter By menu and fetch the data on the inactive corpse dragger.
+			game.printToLog("[SWAP] Opening the Filter menu...", tag = tag)
 			game.findAndPress("echelon_filter_by")
 			val corpseDraggerData = game.configData.tdolls.find {
 				it.name == inactiveCorpseDragger
@@ -212,10 +222,12 @@ class Operation(val game: Game) {
 			} else {
 				corpseDraggerData!!.rarity
 			}
+			game.printToLog("[SWAP] Filtering by $newRarity star ${corpseDraggerData.type.uppercase()} T-Dolls...", tag = tag)
 			game.findAndPress("echelon_${newRarity}_star")
 			game.findAndPress("echelon_formation_filter_by_confirm")
 
 			// Now find all locations of Captains and perform OCR to determine the location of the Captain of the echelon to swap with.
+			game.printToLog("[SWAP] Now determining location of the captain $inactiveCorpseDragger T-Doll...", tag = tag)
 			var tries = 5
 			while (tries > 0) {
 				val captainLocations = game.imageUtils.findAll("echelon_captain")
@@ -271,6 +283,8 @@ class Operation(val game: Game) {
 	 * @return Point object of the corpse dragger location.
 	 */
 	private fun findCorpseDraggerLocation(): Point? {
+		game.printToLog("\n[SWAP] Starting process of finding corpse dragger in currently selected echelon...", tag = tag)
+
 		// Select the DPS echelon.
 		selectEchelon(game.configData.dpsEchelons[echelonDeploymentIndex].toInt())
 
@@ -299,7 +313,7 @@ class Operation(val game: Game) {
 
 			game.printToLog("[SWAP] Initial detection of ${result.first}, confidence = ${result.second}", tag = tag)
 			if (game.configData.corpseDragger1 == result.first || game.configData.corpseDragger2 == result.first) {
-				game.printToLog("[SWAP] Found the corpse dragger ${result.first} at $location.", tag = tag)
+				game.printToLog("[SWAP] Found the corpse dragger ${result.first} at $location.\n", tag = tag)
 
 				// Mark this T-Doll as the active corpse dragger that is present in the DPS echelon.
 				activeCorpseDragger = result.first
@@ -417,6 +431,11 @@ class Operation(val game: Game) {
 		game.printToLog("= = = = = = = = = = = = = = = =", tag = tag)
 	}
 
+	/**
+	 * Resupplies the selected echelon.
+	 *
+	 * @param move Contains the coordinate data for the echelon's absolute position.
+	 */
 	private fun resupply(move: PlanningModeData.Companion.Moves) {
 		game.printToLog("\n[RESUPPLY] Resupplying echelon at ${move.coordinates} now...", tag = tag)
 		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
@@ -459,7 +478,7 @@ class Operation(val game: Game) {
 				) == null
 			) {
 				if (game.imageUtils.findImage("echelon_warning", tries = 1, suppressError = true) != null) {
-					throw Exception ("Echelon ran out of ammo/rations. Stopping the bot to avoid any further complications.")
+					throw Exception("Echelon ran out of ammo/rations. Stopping the bot to avoid any further complications.")
 				}
 
 				game.printToLog("[EXECUTE_PLAN] The End Round button has vanished. Bot must be in combat so waiting for combat end before retrying checks...", tag = tag)
@@ -481,39 +500,58 @@ class Operation(val game: Game) {
 		}
 
 		if (mustRetreat) {
-			resetZoom()
-
-			game.wait(0.5)
-			game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
-			game.wait(0.5)
-			game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
-
-			// Retreat this echelon.
-			game.findAndPress("retreat")
-			game.findAndPress("retreat_ok")
-
-			// Now terminate the mission.
-			game.findAndPress("terminate_mission")
-			game.findAndPress("terminate_mission_confirm")
-			swapDraggerNow = true
-			mustRetreat = false
-			retreated = true
-			retreatLocation = Point()
-			echelonDeploymentIndex = 0
-			dummyDeploymentIndex = 0
+			game.printToLog("\n[EXECUTE_PLAN] Retreating echelon now...", tag = tag)
+			retreat()
+			reset()
 			return true
 		}
 
 		game.printToLog("\n[EXECUTE_PLAN] Stopping checks for operation end.", tag = tag)
-		swapDraggerNow = true
-		echelonDeploymentIndex = 0
-		dummyDeploymentIndex = 0
+		reset()
 		val result = game.findAndPress("end_round", tries = 30)
 		return if (result) {
 			game.wait(10.0)
 			result
 		} else {
 			result
+		}
+	}
+
+	/**
+	 * Retreats the dummy echelon.
+	 *
+	 */
+	private fun retreat() {
+		resetZoom()
+
+		game.wait(0.5)
+		game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
+		game.wait(0.5)
+		game.gestureUtils.tap(retreatLocation.x, retreatLocation.y, "node")
+
+		// Retreat this echelon.
+		game.findAndPress("retreat")
+		game.findAndPress("retreat_ok")
+
+		// Now terminate the mission.
+		game.findAndPress("terminate_mission")
+		game.findAndPress("terminate_mission_confirm")
+	}
+
+	/**
+	 * Resets the running variables.
+	 *
+	 * @param isRetreating Adjust the variables used for retreating behavior is true. Defaults to false.
+	 */
+	private fun reset(isRetreating: Boolean = false) {
+		swapDraggerNow = true
+		echelonDeploymentIndex = 0
+		dummyDeploymentIndex = 0
+
+		if (isRetreating) {
+			mustRetreat = false
+			retreated = true
+			retreatLocation = Point()
 		}
 	}
 

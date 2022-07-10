@@ -9,8 +9,6 @@ import org.opencv.core.Point
 class Navigation(val game: Game) {
 	private val tag = "[Navigation]"
 
-	// TODO: rename enterMap and separate out logic for selecting the mission.
-
 	/**
 	 * Starts the process to verify and/or enter the correct map.
 	 *
@@ -19,7 +17,7 @@ class Navigation(val game: Game) {
 	 * @param retreated Skips the entire navigation process if the bot previously retreated and terminated a run. Defaults to false.
 	 * @return True if the bot was able to enter the specified map.
 	 */
-	fun enterMap(mapName: String, skipInitialLocationCheck: Boolean = false, retreated: Boolean = false): Boolean {
+	fun startNavigation(mapName: String, skipInitialLocationCheck: Boolean = false, retreated: Boolean = false): Boolean {
 		if (retreated) {
 			// Now that the correct episode is now active, select the map.
 			if (!game.findAndPress("map$mapName")) {
@@ -70,7 +68,6 @@ class Navigation(val game: Game) {
 			"11-5" -> {
 				"11"
 			}
-			////////////////// TODO: Implement the rest of the maps.
 			else -> {
 				""
 			}
@@ -87,8 +84,6 @@ class Navigation(val game: Game) {
 			val chapterNumber: Int = mapName.split("-")[0].toInt()
 			navigateToCorrectEpisode(episodeString, chapterNumber) ?: throw Exception("Bot could not find the correct episode at the end.")
 		}
-
-		////////////////// TODO: Implement scrolling the map list if needed.
 
 		// Now that the correct episode is now active, select the map.
 		if (!game.findAndPress("map$mapName")) {

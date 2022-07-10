@@ -1,13 +1,14 @@
 package com.steve1316.gfl_android_auto.bot
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
-import androidx.preference.PreferenceManager
 import com.steve1316.gfl_android_auto.MainActivity.loggerTag
 import com.steve1316.gfl_android_auto.StartModule
 import com.steve1316.gfl_android_auto.data.ConfigData
-import com.steve1316.gfl_android_auto.utils.*
+import com.steve1316.gfl_android_auto.utils.ImageUtils
+import com.steve1316.gfl_android_auto.utils.MediaProjectionService
+import com.steve1316.gfl_android_auto.utils.MessageLog
+import com.steve1316.gfl_android_auto.utils.MyAccessibilityService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.opencv.core.Point
@@ -30,7 +31,7 @@ class Game(private val myContext: Context) {
 	val tdoll: TDoll = TDoll(this)
 
 	var runsCompleted = 0
-	val maxChapterNumber: Int = 11
+	val maxChapterNumber: Int = 11 // TODO: Update this when the bot can support higher chapters.
 	var is1920 = false
 
 	/**
@@ -247,8 +248,6 @@ class Game(private val myContext: Context) {
 		}
 	}
 
-
-
 	/**
 	 * Bot will begin automation here.
 	 *
@@ -261,14 +260,8 @@ class Game(private val myContext: Context) {
 		landscapeCheck()
 		dimensionCheck()
 
+		// Wait several seconds for the notification to go away if setting up screenshots.
 		if (!configData.enableSetup) wait(1.0) else wait(3.0)
-
-		if (configData.debugMode) {
-			printToLog("\n[DEBUG] I am starting here but as a debugging message!")
-		} else {
-			printToLog("\n[INFO] I am starting here!!!")
-		}
-
 		if (configData.enableSetup) {
 			takeSetupScreenshots()
 			return true
@@ -283,7 +276,6 @@ class Game(private val myContext: Context) {
 			}
 
 			// Navigate to the map.
-			// TODO: Cover all instances where the bot might be anywhere in the app. It must get to the home screen first before continuing.
 			val skipLocationCheck = checkCombatScreen()
 			if (!skipLocationCheck) {
 				if (!checkHomeScreen()) {
@@ -295,7 +287,7 @@ class Game(private val myContext: Context) {
 				repair()
 			}
 
-			nav.enterMap(configData.mapName, skipInitialLocationCheck = skipLocationCheck, retreated = op.retreated)
+			nav.startNavigation(configData.mapName, skipInitialLocationCheck = skipLocationCheck, retreated = op.retreated)
 			if (imageUtils.findImage("insufficient_slots", tries = 2) != null) {
 				// Handle the case where there are too many T-Dolls in the inventory.
 				val moveToLocations = imageUtils.findAll("dismantle_move_to")
@@ -319,6 +311,7 @@ class Game(private val myContext: Context) {
 			if (op.executeOperation()) {
 				// Check if the operation ended in success or failure.
 				if (!op.retreated && imageUtils.findImage("result_settlement", tries = 10) != null) {
+					// Tap the screen to start the animation of acquiring a T-Doll.
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 					wait(4.0)
 
@@ -330,13 +323,15 @@ class Game(private val myContext: Context) {
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 					wait(1.0)
 
-					// Swap out the corpse draggers if it is enabled.
+					// Swap out the corpse draggers if it is enabled by going back to the home screen.
 					if (configData.enableCorpseDrag && op.swapDraggerNow) {
+						// TODO: Does it actually do this or does it always do it while in the Planning Phase?
 						printToLog("[INFO] Now swapping corpse draggers from the home screen...")
 						findAndPress("return_to_base")
 						waitScreenTransition()
 						op.beginCorpseDraggerSwap()
 					} else {
+						// Start tapping on the screen to eventually head back to the mission selection screen.
 						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 						wait(1.0)
 						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
@@ -356,18 +351,16 @@ class Game(private val myContext: Context) {
 
 		printToLog("\n[INFO] Acquired T-Dolls: ${tdoll.acquiredDolls}")
 
-		printToLog("\n[INFO] I am ending here!")
-
 		val endTime: Long = System.currentTimeMillis()
 		val runTime: Long = endTime - startTime
 		printToLog("[INFO] Total Runtime: ${runTime}ms or ${printTime()}")
 
-		val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(myContext)
-		if (sharedPreferences.getBoolean("enableDiscordNotifications", false)) {
-			wait(1.0)
-			DiscordUtils.queue.add("Total Runtime: ${runTime}ms or ${printTime()}")
-			wait(1.0)
-		}
+//		val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(myContext)
+//		if (sharedPreferences.getBoolean("enableDiscordNotifications", false)) {
+//			wait(1.0)
+//			DiscordUtils.queue.add("Total Runtime: ${runTime}ms or ${printTime()}")
+//			wait(1.0)
+//		}
 
 		return true
 	}

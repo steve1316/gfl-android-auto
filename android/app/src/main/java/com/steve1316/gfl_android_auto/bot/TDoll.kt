@@ -17,6 +17,7 @@ class TDoll(val game: Game) {
 	 * @return String from Tesseract or empty string in the case of ImageUtils being unable to get a screenshot.
 	 */
 	fun startDetection(): String {
+		// In order to start the process, it needs to see the T-Doll screen with the Share button at the top left.
 		val shareLocation = game.imageUtils.findImage("tdoll_share", tries = 10, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))
 		return if (shareLocation != null) {
 			game.printToLog("\n[DETECTION] T-Doll is on screen. Now attempting to determine name of T-Doll...", tag = tag)
@@ -29,7 +30,9 @@ class TDoll(val game: Game) {
 
 			var similarityObj = calculateSimilarity(result)
 
+			// It is 0.79 instead of 0.80 to avoid certain situations where the wrong result was accepted at around 0.79 instead of the next one at around 0.80
 			if (similarityObj.second < 0.79) {
+				// Try again but without thresholding the screenshot.
 				if (game.configData.debugMode) game.printToLog("[DEBUG] Confidence of ${similarityObj.second} < 0.79, so retrying one more time without thresholding...", tag = tag)
 				val nameSecondTry = game.imageUtils.findTextTesseract(shareLocation.x.toInt() - 80, shareLocation.y.toInt() + 90, 630, 90, thresh = false)
 				val resultSecondTry = game.tdoll.calculateSimilarity(nameSecondTry)
@@ -56,9 +59,9 @@ class TDoll(val game: Game) {
 		var resultString = ""
 		var resultConfidence = 0.0
 
-		// Now determine text similarity.
 		val stringCompare = JaroWinkler()
 
+		// Now determine text similarity by comparing the result with each T-Doll in data.
 		game.configData.tdolls.forEach { tdoll ->
 			val tempConfidence = stringCompare.similarity(tdoll.name, testString)
 			if (tempConfidence > resultConfidence) {
