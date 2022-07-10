@@ -48,6 +48,7 @@ const Settings = () => {
         "2-3": require("../../images/2-3.webp"),
         "4-3e": require("../../images/4-3e.webp"),
         "5-2e": require("../../images/5-2e.webp"),
+        "11-5": require("../../images/11-5.webp"),
     }
 
     interface Item {
