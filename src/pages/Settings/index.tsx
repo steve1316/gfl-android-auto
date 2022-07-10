@@ -46,6 +46,7 @@ const Settings = () => {
         "0-2": require("../../images/0-2.webp"),
         "0-4": require("../../images/0-4.webp"),
         "2-3": require("../../images/2-3.webp"),
+        "4-3e": require("../../images/4-3e.webp"),
         "5-2e": require("../../images/5-2e.webp"),
     }
 

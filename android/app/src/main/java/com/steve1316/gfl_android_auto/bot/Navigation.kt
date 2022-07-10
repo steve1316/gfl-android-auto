@@ -61,6 +61,9 @@ class Navigation(val game: Game) {
 			"2-3" -> {
 				"02"
 			}
+			"4-3e" -> {
+				"04"
+			}
 			"5-2e" -> {
 				"05"
 			}
