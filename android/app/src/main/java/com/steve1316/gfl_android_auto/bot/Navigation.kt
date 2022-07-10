@@ -2,6 +2,7 @@ package com.steve1316.gfl_android_auto.bot
 
 import com.steve1316.gfl_android_auto.utils.MediaProjectionService
 import org.opencv.core.Point
+import kotlin.math.abs
 
 /**
  * This class handles navigation to and from the Combat screen.
@@ -132,13 +133,13 @@ class Navigation(val game: Game) {
 				game.printToLog("[Navigation] Nearest chapter button of ${chapterButtonPairLocation.second} is less than the required chapter number so scrolling the list down.", tag = tag)
 				game.gestureUtils.swipe(
 					chapterButtonPairLocation.second!!.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, chapterButtonPairLocation.second!!.x.toFloat(),
-					(MediaProjectionService.displayHeight.toFloat() / 2) - 400
+					abs((MediaProjectionService.displayHeight.toFloat() / 2) - (abs(chapterNumber - chapterButtonPairLocation.first) * 100))
 				)
 			} else {
 				game.printToLog("[Navigation] Nearest chapter button of ${chapterButtonPairLocation.second} is more than the required chapter number so scrolling the list up.", tag = tag)
 				game.gestureUtils.swipe(
 					chapterButtonPairLocation.second!!.x.toFloat(), MediaProjectionService.displayHeight.toFloat() / 2, chapterButtonPairLocation.second!!.x.toFloat(),
-					(MediaProjectionService.displayHeight.toFloat() / 2) + 400
+					(MediaProjectionService.displayHeight.toFloat() / 2) + (abs(chapterNumber - chapterButtonPairLocation.first) * 100)
 				)
 			}
 
