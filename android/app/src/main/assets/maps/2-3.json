@@ -1,0 +1,55 @@
+{
+    "init": {
+        "1": {
+            "action": "pinch_out",
+            "spacing": [1000, 100],
+            "coordinates": []
+        },
+        "2": {
+            "action": "pinch_out",
+            "spacing": [1000, 100],
+            "coordinates": []
+        },
+        "3": {
+            "action": "swipe_up",
+            "spacing": [200],
+            "coordinates": []
+        },
+        "4": {
+            "action": "deploy_dummy",
+            "spacing": [675, 620],
+            "coordinates": []
+        },
+        "5": {
+            "action": "deploy_echelon",
+            "spacing": [],
+            "coordinates": [1190, 275]
+        }
+    },
+    "moves": {
+        "1": {
+            "action": "resupply",
+            "coordinates": [675, 620]
+        },
+        "2": {
+            "action": "start",
+            "coordinates": [1190, 275]
+        },
+        "3": {
+            "action": "move",
+            "coordinates": [1285, 475]
+        },
+        "4": {
+            "action": "move",
+            "coordinates": [1135, 500]
+        },
+        "5": {
+            "action": "move",
+            "coordinates": [955, 395]
+        },
+        "6": {
+            "action": "move",
+            "coordinates": [880, 590]
+        }
+    }
+}

@@ -45,6 +45,7 @@ const Settings = () => {
     const maps = {
         "0-2": require("../../images/0-2.webp"),
         "0-4": require("../../images/0-4.webp"),
+        "2-3": require("../../images/2-3.webp"),
     }
 
     interface Item {
