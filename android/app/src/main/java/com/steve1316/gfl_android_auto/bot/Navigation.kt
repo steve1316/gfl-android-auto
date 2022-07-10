@@ -76,7 +76,11 @@ class Navigation(val game: Game) {
 		if (episodeString == "") throw Exception("Invalid map name.")
 
 		// First check if the bot is at the correct episode. If not, navigate to it.
-		val epLocation = game.imageUtils.findImage("ep$episodeString", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
+		val epLocation = if (mapName.lowercase().indexOf("e") != -1) {
+			game.imageUtils.findImage("ep${episodeString}_e", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
+		} else {
+			game.imageUtils.findImage("ep$episodeString", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
+		}
 		if (epLocation != null) {
 			game.printToLog("\n[Navigation] We are at the correct episode.", tag = tag)
 		} else {
@@ -86,6 +90,7 @@ class Navigation(val game: Game) {
 		}
 
 		// Now that the correct episode is now active, select the map.
+		if (mapName.lowercase().indexOf("e") != -1) game.findAndPress("map_emergency", tries = 2)
 		if (!game.findAndPress("map$mapName")) {
 			game.printToLog("\n[Navigation] Map $mapName was not found. Scrolling list of available maps...", tag = tag)
 			var tries = 3

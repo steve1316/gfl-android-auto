@@ -325,7 +325,7 @@ class Operation(val game: Game) {
 	}
 
 	/**
-	 * Select and deploys a echelon on the already selected node. If swapDraggerNow is set, then it will only select the echelon.
+	 * Select and deploys a echelon from the list of echelons on the already selected node. If swapDraggerNow is set, then it will only select the echelon.
 	 *
 	 * @param echelonNumber The echelon to deploy.
 	 * @param deployEchelon If true, deploys the selected echelon onto the currently selected node. Defaults to false.
@@ -453,10 +453,12 @@ class Operation(val game: Game) {
 			}
 			if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
 		}
-		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-		game.wait(0.5)
-		game.findAndPress("resupply")
-		game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
+
+		if (game.findAndPress("resupply", tries = 2)) {
+			game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
+		} else {
+			game.printToLog("[WARNING] Resupplying failed for echelon at ${move.coordinates}.", tag = tag, isError = true)
+		}
 	}
 
 	/**
