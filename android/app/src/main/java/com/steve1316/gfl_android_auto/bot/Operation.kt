@@ -510,7 +510,7 @@ class Operation(val game: Game) {
 		if (mustRetreat) {
 			game.printToLog("\n[EXECUTE_PLAN] Retreating echelon now...", tag = tag)
 			retreat()
-			reset()
+			reset(isRetreating = true)
 			return true
 		}
 
