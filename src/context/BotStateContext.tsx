@@ -43,8 +43,8 @@ export const defaultSettings: Settings = {
     gfl: {
         map: "0-2",
         amount: 1,
-        dummyEchelons: [],
-        dpsEchelons: [],
+        dummyEchelons: [1],
+        dpsEchelons: [2],
         debugMode: false,
         enableSetup: false,
         enableRepair: true,
@@ -52,6 +52,8 @@ export const defaultSettings: Settings = {
         enableCorpseDrag: false,
         corpseDragger1: "",
         corpseDragger2: "",
+        enableCorpseDragger1Mod: false,
+        enableCorpseDragger2Mod: false,
     },
     android: {
         enableDelayTap: false,
