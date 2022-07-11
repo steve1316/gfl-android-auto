@@ -2,7 +2,7 @@
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/steve1316/gfl-android-auto?logo=GitHub) ![GitHub last commit](https://img.shields.io/github/last-commit/steve1316/gfl-android-auto?logo=GitHub) ![GitHub issues](https://img.shields.io/github/issues/steve1316/gfl-android-auto?logo=GitHub) ![GitHub pull requests](https://img.shields.io/github/issues-pr/steve1316/gfl-android-auto?logo=GitHub) ![GitHub](https://img.shields.io/github/license/steve1316/gfl-android-auto?logo=GitHub)
 
-Project Summary TODO.
+This project aims to provide a basic Android-only implementation of automation for the popular mobile game, Girls' Frontline. A similar, more sophisticated bot is located at [WAI2K](https://github.com/waicool20/WAI2K).
 
 # Table of Contents
 
@@ -17,13 +17,13 @@ This application is developed with educational purposes in mind while exploring 
 
 # Features
 
--   [ ] Run a variety of maps to farm EXP and Cores.
+-   [x] Run a variety of maps to farm EXP and Cores.
     -   [x] 0-2
-    -   [ ] 2-3
-    -   [ ] 4-3e
-    -   [ ] 5-2e
-    -   [ ] 0-4
-    -   [ ] 11-5
+    -   [x] 2-3
+    -   [x] 4-3e
+    -   [x] 5-2e
+    -   [x] 0-4
+    -   [x] 11-5
 -   [x] Use specified Dummy and DPS Echelons.
     -   [x] Swaps out DPS between Echelons for Corpse Dragging.
 -   [x] ~~Enhance~~/Dismantle excess T-Dolls.
@@ -37,7 +37,12 @@ This application is developed with educational purposes in mind while exploring 
 
 # Instructions
 
-1. TODO
+1. Download the latest release by clicking on the "Releases" button on the right side of the page.
+2. Start up the application and head to the Settings page.
+3. Tweak the settings to your needs including which echelons to deploy, corpse dragging behavior, etc.
+4. Now head back to the Home page and press the "Start" button to begin the process of setting up the necessary permissions to be used by the bot.
+5. When done, pressing the "Start" button again will bring up the floating overlay button.
+6. Head into Girls' Frontline and start the bot on the home screen. Recommended to put the floating overlay button on the bottom left.
 
 # Technologies Used
 
