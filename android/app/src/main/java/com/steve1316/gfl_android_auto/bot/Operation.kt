@@ -38,6 +38,9 @@ class Operation(val game: Game) {
 			throw Exception("Game failed to load into the map.")
 		}
 
+		// Reset the map zoom if this is the first run.
+		if (firstTime) resetZoom()
+
 		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
 		game.printToLog("[PREPARATION] Starting preparation for operation.", tag = tag)
 
@@ -171,6 +174,9 @@ class Operation(val game: Game) {
 				}
 			}
 		}
+
+		game.printToLog("\n[RESET] Map zoom is hopefully reset.", tag = tag)
+		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
 	}
 
 	/**
