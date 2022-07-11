@@ -495,12 +495,22 @@ class Operation(val game: Game) {
 
 				// Wait until combat ends.
 				while (!game.imageUtils.waitVanish("combat_pause", timeout = 1, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3))) {
+					readyForDetection = true
 					game.wait(1.0)
 				}
 
-				game.wait(5.0)
-				game.tdoll.startDetection()
-				game.wait(8.0)
+				if (readyForDetection) {
+					game.printToLog("[EXECUTE_PLAN] Waiting for the T-Doll reward to show up.", tag = tag)
+					while (game.imageUtils.findImage("tdoll_share", tries = 1, suppressError = true,
+							region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3)) == null) {
+						game.wait(1.0)
+					}
+
+					game.tdoll.startDetection()
+					game.wait(8.0)
+				}
+
+				readyForDetection = false
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
 				tries -= 1
