@@ -440,24 +440,24 @@ class Operation(val game: Game) {
 		game.printToLog("\n[RESUPPLY] Resupplying echelon at ${move.coordinates} now...", tag = tag)
 		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
 		game.wait(0.5)
-		if (game.imageUtils.findImage("resupply", tries = 1) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
-			var tries = 3
-			while (tries > 0) {
-				game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-				game.wait(0.5)
-				if (game.imageUtils.findImage("resupply", tries = 3) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
-					tries -= 1
-				} else {
-					break
-				}
-			}
-			if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
-		}
 
-		if (game.findAndPress("resupply", tries = 2)) {
+		// If the bot had to select, then keep pressing on the node until the Resupply button appears.
+		var tries = 5
+		while (tries > 0) {
+			game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+			game.wait(0.5)
+			if (game.imageUtils.findImage("resupply", tries = 2) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
+				tries -= 1
+			} else {
+				break
+			}
+		}
+		if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
+
+		if (game.findAndPress("resupply")) {
 			game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
 		} else {
-			game.printToLog("[WARNING] Resupplying failed for echelon at ${move.coordinates}.", tag = tag, isError = true)
+			game.printToLog("[WARNING] Resupplying failed for echelon at ${move.coordinates} or it was already resupplied.", tag = tag, isError = true)
 		}
 	}
 
