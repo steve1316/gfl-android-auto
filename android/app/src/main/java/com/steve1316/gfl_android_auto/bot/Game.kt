@@ -335,13 +335,14 @@ class Game(private val myContext: Context) {
 						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
 						wait(1.0)
 						gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
-						wait(5.0)
+
+						runsCompleted += 1
+						if (runsCompleted < configData.amount) wait(5.0)
 					}
 				} else {
 					gestureUtils.tap(MediaProjectionService.displayWidth.toDouble() / 2, MediaProjectionService.displayHeight.toDouble() / 2, "node")
+					runsCompleted += 1
 				}
-
-				runsCompleted += 1
 			} else {
 				Log.d(loggerTag, "[DEBUG] The bot did not complete a run. $failureTries tries left before stopping the bot.")
 				failureTries -= 1
