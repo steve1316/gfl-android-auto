@@ -26,6 +26,7 @@ class ConfigData(myContext: Context) {
 	val dummyEchelons: List<String>
 	val dpsEchelons: List<String>
 	val enableSetup: Boolean
+	val enableSetupDeployment: Boolean
 	val enableRepair: Boolean
 	val repairInterval: Int
 	val enableCorpseDrag: Boolean
@@ -59,6 +60,7 @@ class ConfigData(myContext: Context) {
 		dummyEchelons = sharedPreferences.getString("dummyEchelons", "")!!.split("|")
 		dpsEchelons = sharedPreferences.getString("dpsEchelons", "")!!.split("|")
 		enableSetup = sharedPreferences.getBoolean("enableSetup", false)
+		enableSetupDeployment = sharedPreferences.getBoolean("enableSetupDeployment", false)
 		enableRepair = sharedPreferences.getBoolean("enableRepair", true)
 		repairInterval = sharedPreferences.getInt("amount", 3)
 		enableCorpseDrag = sharedPreferences.getBoolean("enableCorpseDrag", false)

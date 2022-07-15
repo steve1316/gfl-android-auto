@@ -261,9 +261,12 @@ class Game(private val myContext: Context) {
 		dimensionCheck()
 
 		// Wait several seconds for the notification to go away if setting up screenshots.
-		if (!configData.enableSetup) wait(1.0) else wait(3.0)
+		if (!configData.enableSetup && !configData.enableSetupDeployment) wait(1.0) else wait(3.0)
 		if (configData.enableSetup) {
 			takeSetupScreenshots()
+			return true
+		} else if (configData.enableSetupDeployment) {
+			op.prepareAndStartOperation()
 			return true
 		}
 

@@ -27,7 +27,7 @@ class Operation(val game: Game) {
 	 *
 	 */
 	fun prepareAndStartOperation() {
-		if (!game.configData.enableSetup) game.wait(3.0)
+		if (!game.configData.enableSetup && !game.configData.enableSetupDeployment) game.wait(3.0)
 
 		if (game.imageUtils.findImage(
 				"start_operation",
@@ -39,7 +39,7 @@ class Operation(val game: Game) {
 		}
 
 		// Reset the map zoom if this is the first run.
-		if (firstTime) resetZoom()
+		if (firstTime) resetZoom(skipSetup = true)
 
 		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
 		game.printToLog("[PREPARATION] Starting preparation for operation.", tag = tag)
@@ -76,7 +76,7 @@ class Operation(val game: Game) {
 					game.wait(2.0)
 				}
 				"deploy_dummy" -> {
-					if (!game.configData.enableSetup) {
+					if (!game.configData.enableSetup && game.configData.enableSetupDeployment) {
 						if (swapDraggerNow) {
 							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (1)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
@@ -95,7 +95,7 @@ class Operation(val game: Game) {
 					}
 				}
 				"deploy_echelon" -> {
-					if (!game.configData.enableSetup) {
+					if (!game.configData.enableSetup && game.configData.enableSetupDeployment) {
 						if (swapDraggerNow) {
 							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (2)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
@@ -123,7 +123,7 @@ class Operation(val game: Game) {
 		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
 
 		// Now that the echelons are deployed, start the operation.
-		if (!game.configData.enableSetup) {
+		if (!game.configData.enableSetup && !game.configData.enableSetupDeployment) {
 			game.findAndPress("start_operation", tries = 30)
 			game.wait(3.0)
 		}
@@ -132,8 +132,9 @@ class Operation(val game: Game) {
 	/**
 	 * Resets the zoom on the map to after Planning Mode levels of zoom.
 	 *
+	 * @param skipSetup Skips the setup process and only perform the zoom in actions.
 	 */
-	private fun resetZoom() {
+	private fun resetZoom(skipSetup: Boolean = false) {
 		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
 		game.printToLog("[RESET] Resetting the map zoom now...", tag = tag)
 		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
@@ -141,36 +142,38 @@ class Operation(val game: Game) {
 		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
 		game.wait(2.0)
 
-		SetupData.setupSteps.forEach { init ->
-			if (game.configData.debugMode) game.printToLog("[DEBUG] Setup executing: $init", tag = tag)
-			when (init.action) {
-				"pinch_in" -> {
-					game.printToLog("[RESET] Zooming in the map now...", tag = tag)
-					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
-				}
-				"pinch_out" -> {
-					game.printToLog("[RESET] Zooming out the map now...", tag = tag)
-					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
-				}
-				"swipe_up" -> {
-					game.printToLog("[RESET] Swiping the map up now...", tag = tag)
-					game.gestureUtils.swipe(
-						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
-						MediaProjectionService.displayWidth.toFloat() / 2,
-						(MediaProjectionService.displayHeight.toFloat() / 2) + init.spacing[0].toFloat()
-					)
-					game.wait(2.0)
-				}
-				"swipe_down" -> {
-					game.printToLog("[RESET] Swiping the map down now...", tag = tag)
-					game.gestureUtils.swipe(
-						MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
-						MediaProjectionService.displayWidth.toFloat() / 2,
-						(MediaProjectionService.displayHeight.toFloat() / 2) - init.spacing[0].toFloat()
-					)
-					game.wait(2.0)
+		if (!skipSetup) {
+			SetupData.setupSteps.forEach { init ->
+				if (game.configData.debugMode) game.printToLog("[DEBUG] Setup executing: $init", tag = tag)
+				when (init.action) {
+					"pinch_in" -> {
+						game.printToLog("[RESET] Zooming in the map now...", tag = tag)
+						game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+						game.wait(2.0)
+					}
+					"pinch_out" -> {
+						game.printToLog("[RESET] Zooming out the map now...", tag = tag)
+						game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
+						game.wait(2.0)
+					}
+					"swipe_up" -> {
+						game.printToLog("[RESET] Swiping the map up now...", tag = tag)
+						game.gestureUtils.swipe(
+							MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+							MediaProjectionService.displayWidth.toFloat() / 2,
+							(MediaProjectionService.displayHeight.toFloat() / 2) + init.spacing[0].toFloat()
+						)
+						game.wait(2.0)
+					}
+					"swipe_down" -> {
+						game.printToLog("[RESET] Swiping the map down now...", tag = tag)
+						game.gestureUtils.swipe(
+							MediaProjectionService.displayWidth.toFloat() / 2, MediaProjectionService.displayHeight.toFloat() / 2,
+							MediaProjectionService.displayWidth.toFloat() / 2,
+							(MediaProjectionService.displayHeight.toFloat() / 2) - init.spacing[0].toFloat()
+						)
+						game.wait(2.0)
+					}
 				}
 			}
 		}
@@ -501,8 +504,11 @@ class Operation(val game: Game) {
 
 				if (readyForDetection) {
 					game.printToLog("[EXECUTE_PLAN] Waiting for the T-Doll reward to show up.", tag = tag)
-					while (game.imageUtils.findImage("tdoll_share", tries = 1, suppressError = true,
-							region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3)) == null) {
+					while (game.imageUtils.findImage(
+							"tdoll_share", tries = 1, suppressError = true,
+							region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3)
+						) == null
+					) {
 						game.wait(1.0)
 					}
 
