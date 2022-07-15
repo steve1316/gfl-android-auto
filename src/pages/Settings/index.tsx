@@ -367,11 +367,34 @@ const Settings = () => {
                     subtitle="Check this to enable more detailed log messages."
                 />
 
+                <Divider style={{ marginBottom: 10 }} />
+                <Text style={{ marginBottom: 10, color: "black" }}>The below checkboxes can only have 1 active at a time.</Text>
+                <Divider />
+
                 <CustomCheckbox
                     isChecked={bsc.settings.gfl.enableSetup}
-                    onPress={() => bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup } })}
+                    onPress={() => {
+                        if (bsc.settings.gfl.enableSetupDeployment) {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup, enableSetupDeployment: false } })
+                        } else {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup } })
+                        }
+                    }}
                     text="Enable Setup Mode"
-                    subtitle="Check this to enable setting up a new map to support by following zoom instructions in the specified map's .json file and taking 5 screenshots to be saved to the /temp/ folder. It can then be used to manually determine point locations. Development purposes only."
+                    subtitle="Check this to enable setting up a new map to support by following zoom instructions in the specified map's .json file and taking 5 screenshots to be saved to the /temp/ folder. It can then be used to manually determine point locations. Must be run on the map itself already on the screen. Development purposes only."
+                />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.enableSetupDeployment}
+                    onPress={() => {
+                        if (bsc.settings.gfl.enableSetup) {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment, enableSetup: false } })
+                        } else {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment } })
+                        }
+                    }}
+                    text="Enable Test Deployment"
+                    subtitle="Check this to test deployment for the chosen map. Must be run on the map itself already on the screen. Development purposes only."
                 />
             </View>
         )

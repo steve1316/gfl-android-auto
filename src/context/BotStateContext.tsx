@@ -14,6 +14,7 @@ export interface Settings {
         dpsEchelons: number[]
         debugMode: boolean
         enableSetup: boolean
+        enableSetupDeployment: boolean
         enableRepair: boolean
         repairInterval: number
         enableCorpseDrag: boolean
@@ -47,6 +48,7 @@ export const defaultSettings: Settings = {
         dpsEchelons: [2],
         debugMode: false,
         enableSetup: false,
+        enableSetupDeployment: false,
         enableRepair: true,
         repairInterval: 3,
         enableCorpseDrag: false,
