@@ -27,7 +27,7 @@ class Operation(val game: Game) {
 	 *
 	 */
 	fun prepareAndStartOperation() {
-		if (!game.configData.enableSetup && !game.configData.enableSetupDeployment) game.wait(3.0)
+		if (!game.configData.enableSetup && !game.configData.enableSetupDeployment && !game.configData.enableSetupPlanning) game.wait(3.0)
 
 		if (game.imageUtils.findImage(
 				"start_operation",
@@ -76,7 +76,7 @@ class Operation(val game: Game) {
 					game.wait(2.0)
 				}
 				"deploy_dummy" -> {
-					if (!game.configData.enableSetup && game.configData.enableSetupDeployment) {
+					if ((!game.configData.enableSetup && !game.configData.enableSetupDeployment) || game.configData.enableSetupPlanning) {
 						if (swapDraggerNow) {
 							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (1)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
@@ -95,7 +95,7 @@ class Operation(val game: Game) {
 					}
 				}
 				"deploy_echelon" -> {
-					if (!game.configData.enableSetup && game.configData.enableSetupDeployment) {
+					if ((!game.configData.enableSetup && !game.configData.enableSetupDeployment) || game.configData.enableSetupPlanning) {
 						if (swapDraggerNow) {
 							game.printToLog("[PREPARATION] Starting the initial process of swapping corpse draggers (2)...", tag = tag)
 							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
@@ -123,7 +123,7 @@ class Operation(val game: Game) {
 		game.printToLog("* * * * * * * * * * * * * * * * *", tag = tag)
 
 		// Now that the echelons are deployed, start the operation.
-		if (!game.configData.enableSetup && !game.configData.enableSetupDeployment) {
+		if ((!game.configData.enableSetup && !game.configData.enableSetupDeployment) || game.configData.enableSetupPlanning) {
 			game.findAndPress("start_operation", tries = 30)
 			game.wait(3.0)
 		}
@@ -446,27 +446,29 @@ class Operation(val game: Game) {
 	 * @param move Contains the coordinate data for the echelon's absolute position.
 	 */
 	private fun resupply(move: PlanningModeData.Companion.Moves) {
-		game.printToLog("\n[RESUPPLY] Resupplying echelon at ${move.coordinates} now...", tag = tag)
-		game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
-		game.wait(0.5)
-
-		// If the bot had to select, then keep pressing on the node until the Resupply button appears.
-		var tries = 5
-		while (tries > 0) {
+		if (!game.configData.enableSetupPlanning) {
+			game.printToLog("\n[RESUPPLY] Resupplying echelon at ${move.coordinates} now...", tag = tag)
 			game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
 			game.wait(0.5)
-			if (game.imageUtils.findImage("resupply", tries = 2) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
-				tries -= 1
-			} else {
-				break
-			}
-		}
-		if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
 
-		if (game.findAndPress("resupply")) {
-			game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
-		} else {
-			game.printToLog("[WARNING] Resupplying failed for echelon at ${move.coordinates} or it was already resupplied.", tag = tag, isError = true)
+			// If the bot had to select, then keep pressing on the node until the Resupply button appears.
+			var tries = 5
+			while (tries > 0) {
+				game.gestureUtils.tap(move.coordinates[0].toDouble(), move.coordinates[1].toDouble(), "node")
+				game.wait(0.5)
+				if (game.imageUtils.findImage("resupply", tries = 2) == null && !game.findAndPress("planning_mode_select", tries = 2)) {
+					tries -= 1
+				} else {
+					break
+				}
+			}
+			if (tries <= 0) throw Exception("Failed to resupply echelon at ${move.coordinates}.")
+
+			if (game.findAndPress("resupply")) {
+				game.printToLog("[RESUPPLY] Resupplying done for echelon at ${move.coordinates}.", tag = tag)
+			} else {
+				game.printToLog("[WARNING] Resupplying failed for echelon at ${move.coordinates} or it was already resupplied.", tag = tag, isError = true)
+			}
 		}
 	}
 
