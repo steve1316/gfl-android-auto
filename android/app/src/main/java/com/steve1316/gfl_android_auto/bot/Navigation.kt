@@ -78,9 +78,9 @@ class Navigation(val game: Game) {
 
 		// First check if the bot is at the correct episode. If not, navigate to it.
 		val epLocation = if (mapName.lowercase().indexOf("e") != -1) {
-			game.imageUtils.findImage("ep${episodeString}_e", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
+			game.imageUtils.findImage("ep${episodeString}_e", tries = 3, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
 		} else {
-			game.imageUtils.findImage("ep$episodeString", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
+			game.imageUtils.findImage("ep$episodeString", tries = 3, region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2))
 		}
 		if (epLocation != null) {
 			game.printToLog("\n[Navigation] We are at the correct episode.", tag = tag)
