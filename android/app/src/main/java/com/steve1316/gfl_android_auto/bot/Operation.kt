@@ -50,12 +50,12 @@ class Operation(val game: Game) {
 				"pinch_in" -> {
 					game.printToLog("[PREPARATION] Zooming in the map now...", tag = tag)
 					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
+					game.wait(1.0)
 				}
 				"pinch_out" -> {
 					game.printToLog("[PREPARATION] Zooming out the map now...", tag = tag)
 					game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-					game.wait(2.0)
+					game.wait(1.0)
 				}
 				"swipe_up" -> {
 					game.printToLog("[PREPARATION] Swiping the map up now...", tag = tag)
@@ -167,10 +167,11 @@ class Operation(val game: Game) {
 	private fun resetZoom(skipSetup: Boolean = false) {
 		game.printToLog("\n* * * * * * * * * * * * * * * * *", tag = tag)
 		game.printToLog("[RESET] Resetting the map zoom now...", tag = tag)
-		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
-		game.wait(2.0)
-		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 100f, 1000f)
-		game.wait(2.0)
+
+		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 1000f, 100f)
+		game.wait(1.0)
+		game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, 1000f, 100f)
+		game.wait(1.0)
 
 		if (!skipSetup) {
 			SetupData.setupSteps.forEach { init ->
@@ -179,12 +180,12 @@ class Operation(val game: Game) {
 					"pinch_in" -> {
 						game.printToLog("[RESET] Zooming in the map now...", tag = tag)
 						game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-						game.wait(2.0)
+						game.wait(1.0)
 					}
 					"pinch_out" -> {
 						game.printToLog("[RESET] Zooming out the map now...", tag = tag)
 						game.gestureUtils.zoom(MediaProjectionService.displayWidth / 2f, MediaProjectionService.displayHeight / 2f, init.spacing[0].toFloat(), init.spacing[1].toFloat())
-						game.wait(2.0)
+						game.wait(1.0)
 					}
 					"swipe_up" -> {
 						game.printToLog("[RESET] Swiping the map up now...", tag = tag)
@@ -521,7 +522,10 @@ class Operation(val game: Game) {
 			if (game.imageUtils.findImage(
 					"end_round", region =
 					intArrayOf(0, MediaProjectionService.displayHeight / 2, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 2), tries = 2, suppressError = true
-				) == null
+				) == null ||
+				game.imageUtils.findImage(
+					"combat_pause", region = intArrayOf(0, 0, MediaProjectionService.displayWidth, MediaProjectionService.displayHeight / 3), tries = 2, suppressError = true
+				) != null
 			) {
 				if (game.imageUtils.findImage("echelon_warning", tries = 1, suppressError = true) != null) {
 					throw Exception("Echelon ran out of ammo/rations. Stopping the bot to avoid any further complications.")
@@ -554,7 +558,7 @@ class Operation(val game: Game) {
 			} else {
 				game.printToLog("[EXECUTE_PLAN] The End Round button is still here. Operation will be considered ended in $tries tries.", tag = tag)
 				tries -= 1
-				game.wait(0.25)
+				game.wait(0.50)
 			}
 		}
 
