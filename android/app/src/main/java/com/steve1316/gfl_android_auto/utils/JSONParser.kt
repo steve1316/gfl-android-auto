@@ -62,6 +62,7 @@ class JSONParser {
 				putBoolean("debugMode", gflObj.getBoolean("debugMode"))
 				putBoolean("enableSetup", gflObj.getBoolean("enableSetup"))
 				putBoolean("enableSetupDeployment", gflObj.getBoolean("enableSetupDeployment"))
+				putBoolean("enableSetupPlanning", gflObj.getBoolean("enableSetupPlanning"))
 				putBoolean("enableRepair", gflObj.getBoolean("enableRepair"))
 				putInt("repairInterval", gflObj.getInt("repairInterval"))
 				putBoolean("enableCorpseDrag", gflObj.getBoolean("enableCorpseDrag"))

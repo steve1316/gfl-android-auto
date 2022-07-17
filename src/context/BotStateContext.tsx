@@ -15,6 +15,7 @@ export interface Settings {
         debugMode: boolean
         enableSetup: boolean
         enableSetupDeployment: boolean
+        enableSetupPlanning: boolean
         enableRepair: boolean
         repairInterval: number
         enableCorpseDrag: boolean
@@ -49,6 +50,7 @@ export const defaultSettings: Settings = {
         debugMode: false,
         enableSetup: false,
         enableSetupDeployment: false,
+        enableSetupPlanning: false,
         enableRepair: true,
         repairInterval: 3,
         enableCorpseDrag: false,

@@ -376,6 +376,8 @@ const Settings = () => {
                     onPress={() => {
                         if (bsc.settings.gfl.enableSetupDeployment) {
                             bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup, enableSetupDeployment: false } })
+                        } else if (bsc.settings.gfl.enableSetupPlanning) {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup, enableSetupPlanning: false } })
                         } else {
                             bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetup: !bsc.settings.gfl.enableSetup } })
                         }
@@ -388,13 +390,42 @@ const Settings = () => {
                     isChecked={bsc.settings.gfl.enableSetupDeployment}
                     onPress={() => {
                         if (bsc.settings.gfl.enableSetup) {
-                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment, enableSetup: false } })
+                            bsc.setSettings({
+                                ...bsc.settings,
+                                gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment, enableSetup: false },
+                            })
+                        } else if (bsc.settings.gfl.enableSetupPlanning) {
+                            bsc.setSettings({
+                                ...bsc.settings,
+                                gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment, enableSetupPlanning: false },
+                            })
                         } else {
                             bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetupDeployment: !bsc.settings.gfl.enableSetupDeployment } })
                         }
                     }}
                     text="Enable Test Deployment"
                     subtitle="Check this to test deployment for the chosen map. Must be run on the map itself already on the screen. Development purposes only."
+                />
+
+                <CustomCheckbox
+                    isChecked={bsc.settings.gfl.enableSetupPlanning}
+                    onPress={() => {
+                        if (bsc.settings.gfl.enableSetup) {
+                            bsc.setSettings({
+                                ...bsc.settings,
+                                gfl: { ...bsc.settings.gfl, enableSetupPlanning: !bsc.settings.gfl.enableSetupPlanning, enableSetup: false },
+                            })
+                        } else if (bsc.settings.gfl.enableSetupDeployment) {
+                            bsc.setSettings({
+                                ...bsc.settings,
+                                gfl: { ...bsc.settings.gfl, enableSetupPlanning: !bsc.settings.gfl.enableSetupPlanning, enableSetupDeployment: false },
+                            })
+                        } else {
+                            bsc.setSettings({ ...bsc.settings, gfl: { ...bsc.settings.gfl, enableSetupPlanning: !bsc.settings.gfl.enableSetupPlanning } })
+                        }
+                    }}
+                    text="Enable Test Planning"
+                    subtitle="Check this to test planning mode for the chosen map. Must be run on the map itself already on the screen. Development purposes only."
                 />
             </View>
         )
