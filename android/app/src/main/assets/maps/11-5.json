@@ -13,42 +13,42 @@
         "3": {
             "action": "deploy_dummy",
             "spacing": [],
-            "coordinates": [1200, 670]
+            "coordinates": [1200, 770]
         },
         "4": {
             "action": "deploy_echelon",
             "spacing": [],
-            "coordinates": [1080, 670]
+            "coordinates": [1080, 770]
         }
     },
     "moves": {
         "1": {
             "action": "resupply",
-            "coordinates": [1200, 670]
+            "coordinates": [1200, 770]
         },
         "2": {
             "action": "start",
-            "coordinates": [1080, 670]
+            "coordinates": [1080, 770]
         },
         "3": {
             "action": "move",
-            "coordinates": [955, 670]
+            "coordinates": [955, 770]
         },
         "4": {
             "action": "move",
-            "coordinates": [955, 575]
+            "coordinates": [955, 675]
         },
         "5": {
             "action": "move",
-            "coordinates": [1080, 575]
+            "coordinates": [1080, 675]
         },
         "6": {
             "action": "move",
-            "coordinates": [1080, 460]
+            "coordinates": [1080, 560]
         },
         "7": {
             "action": "move",
-            "coordinates": [1200, 460]
+            "coordinates": [1200, 560]
         }
     }
 }
