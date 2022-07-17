@@ -2,7 +2,7 @@
 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/steve1316/gfl-android-auto?logo=GitHub) ![GitHub last commit](https://img.shields.io/github/last-commit/steve1316/gfl-android-auto?logo=GitHub) ![GitHub issues](https://img.shields.io/github/issues/steve1316/gfl-android-auto?logo=GitHub) ![GitHub pull requests](https://img.shields.io/github/issues-pr/steve1316/gfl-android-auto?logo=GitHub) ![GitHub](https://img.shields.io/github/license/steve1316/gfl-android-auto?logo=GitHub)
 
-This project aims to provide a basic Android-only implementation of automation for the popular mobile game, Girls' Frontline. A similar, more sophisticated bot is located at [WAI2K](https://github.com/waicool20/WAI2K).
+This project aims to provide a basic Android-only implementation of automation for the popular mobile game, Girls' Frontline using existing system services such as the Accessibility Service for executing taps/swipes and the MediaProjection Service for screenshots. A similar, more sophisticated bot is located at [WAI2K](https://github.com/waicool20/WAI2K).
 
 # Table of Contents
 
@@ -13,7 +13,7 @@ This project aims to provide a basic Android-only implementation of automation f
 
 ## Disclaimer
 
-This application is developed with educational purposes in mind while exploring the potentials of automation and computer vision technologies.
+This application is developed with educational purposes in mind while exploring the potentials of automation and computer vision technologies. Also, the project is in its infancy so expect bugs.
 
 # Features
 
@@ -33,7 +33,12 @@ This application is developed with educational purposes in mind while exploring 
 
 # Requirements
 
-1. [Android Device (Nougat 7.0+)](https://developer.android.com/about/versions)
+1. [Android Device or Emulator (Nougat 7.0+)](https://developer.android.com/about/versions)
+    1. Tested emulator was Bluestacks 5 with the following settings:
+        - P64 (Beta)
+        - 1080x1920 or 1920x1080
+        - 240 DPI
+        - 4+ GB of Memory
 
 # Instructions
 
