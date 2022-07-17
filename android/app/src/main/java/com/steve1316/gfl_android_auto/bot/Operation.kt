@@ -92,6 +92,14 @@ class Operation(val game: Game) {
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
 						if (selectEchelon(game.configData.dummyEchelons[dummyDeploymentIndex].toInt(), deployEchelon = true)) dummyDeploymentIndex++
+						else {
+							recoverSetup()
+							game.printToLog("[PREPARATION] Deploying dummy at (${init.coordinates[0]}, ${init.coordinates[1]}) again after attempting to recover...", tag = tag)
+							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+							game.wait(1.0)
+							if (selectEchelon(game.configData.dummyEchelons[dummyDeploymentIndex].toInt(), deployEchelon = true)) dummyDeploymentIndex++
+							else throw Exception("Failed to deploy echelon after already attempting to recover once.")
+						}
 					}
 				}
 				"deploy_echelon" -> {
@@ -111,6 +119,14 @@ class Operation(val game: Game) {
 						game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
 						game.wait(1.0)
 						if (selectEchelon(game.configData.dpsEchelons[echelonDeploymentIndex].toInt(), deployEchelon = true)) echelonDeploymentIndex++
+						else {
+							recoverSetup()
+							game.printToLog("[PREPARATION] Deploying echelon at (${init.coordinates[0]}, ${init.coordinates[1]}) again after attempting to recover...", tag = tag)
+							game.gestureUtils.tap(init.coordinates[0].toDouble(), init.coordinates[1].toDouble(), "node")
+							game.wait(1.0)
+							if (selectEchelon(game.configData.dpsEchelons[echelonDeploymentIndex].toInt(), deployEchelon = true)) echelonDeploymentIndex++
+							else throw Exception("Failed to deploy echelon after already attempting to recover once.")
+						}
 					}
 				}
 				else -> {
@@ -127,6 +143,20 @@ class Operation(val game: Game) {
 			game.findAndPress("start_operation", tries = 30)
 			game.wait(3.0)
 		}
+	}
+
+	/**
+	 * Attempt to recover from being unable to deploy echelons during setup. This can only occur once.
+	 *
+	 */
+	private fun recoverSetup() {
+		game.printToLog("\n[PREPARATION] Unable to deploy echelon. Attempting to recover only once...", tag = tag)
+
+		game.findAndPress("select_operation")
+		game.waitScreenTransition()
+		game.nav.startNavigation(game.configData.mapName, retreated = true)
+		game.waitScreenTransition()
+		resetZoom()
 	}
 
 	/**
@@ -388,13 +418,15 @@ class Operation(val game: Game) {
 			}
 		}
 
-		if (echelonLocation != null && game.gestureUtils.tap(echelonLocation.x, echelonLocation.y, "echelon$echelonNumber")) {
-			return if (deployEchelon) {
+		return if (echelonLocation != null && game.gestureUtils.tap(echelonLocation.x, echelonLocation.y, "echelon$echelonNumber")) {
+			if (deployEchelon) {
 				game.findAndPress("choose_echelon_ok")
 			} else {
 				false
 			}
-		} else throw Exception("Failed to deploy echelon $echelonNumber in preparation phase.")
+		} else {
+			false
+		}
 	}
 
 	/**

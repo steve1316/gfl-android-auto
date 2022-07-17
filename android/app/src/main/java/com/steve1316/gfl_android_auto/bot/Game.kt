@@ -25,7 +25,7 @@ class Game(private val myContext: Context) {
 	val configData: ConfigData = ConfigData(myContext)
 	val imageUtils: ImageUtils = ImageUtils(myContext, this)
 	val gestureUtils: MyAccessibilityService = MyAccessibilityService.getInstance()
-	private val nav: Navigation = Navigation(this)
+	val nav: Navigation = Navigation(this)
 	private val op: Operation = Operation(this)
 	private val factory: Factory = Factory(this)
 	val tdoll: TDoll = TDoll(this)
