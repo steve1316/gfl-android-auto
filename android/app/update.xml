@@ -1,11 +1,13 @@
 <AppUpdater>
   <update>
     <latestVersion>1.0.0</latestVersion>
-    <url>https://github.com/steve1316/android-cv-bot-template/releases</url>
+    <url>https://github.com/steve1316/gfl-android-auto/releases</url>
     <releaseNotes>
-v1.0.0 - Changelog
+# v1.0.0
 
+This is the initial release of v1.0.0. What this rudimentary and "dumb" bot can do currently is run the maps listed in the Features section of the README, dismantle T-Dolls to make room, repair echelons, repeat logistics, corpse dragging and swapping, and various adjustable settings to change the behavior of the bot.
 
+What the bot cannot do for now is run Event maps and use excess T-Dolls to enhance.
     </releaseNotes>
   </update>
 </AppUpdater>
